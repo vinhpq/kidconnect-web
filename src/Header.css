@@ -1,0 +1,114 @@
+.header {
+    height: auto;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    background-color: #3a6a18;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    justify-content: space-between;
+}
+
+.header__logo {
+    width: 100px;
+    object-fit: contain;
+    margin: 0 20px;
+    margin-top: 18px;
+}
+
+/* .header__search {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    border-radius: 24px;
+}
+
+.header__searchInput {
+    height: 12px;
+    padding: 10px;
+    border: none;
+    width: 100%;
+}
+
+
+.header__searchIcon {
+    padding: 5px;
+    height: 22px !important;
+    background-color: #cd9045;
+} */
+
+.header__info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+
+.header__nav {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    cursor: pointer;
+    margin-right: 30px;
+}
+
+.header__option {
+    display: flex;
+    flex-direction: column;
+    margin-left: 20px;
+    margin-right: 20px;
+    color: white;
+    opacity: 0.7;
+    transition: transform 50ms ease-out;
+}
+
+.header__option:hover {
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+.header__option--active {
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+.header__optionLineOne {
+    font-size: 10px;
+
+}
+
+.header__optionTwo {
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.header__nav > .MuiSvgIcon-root {
+    margin-left: auto;
+    margin-right: 30px;
+}
+
+.header__search {
+    display: flex;
+    width: 30%;
+    height: 30px;
+    align-items: center;
+    border-radius: 999px;
+    background-color: #eff2f5;
+    margin-right: 40px;
+}
+
+.header__searchInput {
+    /* height: 12px; */
+    padding: 20px;
+    border: none;
+    width: 100%;
+    background-color: transparent;
+    font-size: 16px;
+    outline-width: 0;
+}
+
+.header__searchIcon {
+    margin-right: 20px;
+}
