@@ -23,18 +23,18 @@ function Header() {
         <div className="header">
             <img
                 className="header__logo"
-                src="http://pngimg.com/uploads/amazon/amazon_PNG11.png"
-                alt="Amazon logo"
+                src="https://files.slack.com/files-pri/TN44SBSKE-F01ATQ9K0NA/l5-face_profile.jpg"
+                alt="BTM"
             />  
             
-            <div className="header__search">
+            {/* <div className="header__search">
                     <input 
                         className="header__searchInput" 
                         type="text" 
                         placeholder='Tìm kiếm học sinh, giáo viên'
                         onChange={searchChange} />
                     <SearchIcon className='header__searchIcon' />
-            </div>
+            </div> */}
 
             <div className="header__nav">
 

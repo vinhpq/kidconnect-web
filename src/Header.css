@@ -3,7 +3,7 @@
     width: 100vw;
     display: flex;
     align-items: center;
-    background-color: #3a6a18;
+    background-color: green;
     position: sticky;
     top: 0;
     z-index: 100;
@@ -11,10 +11,10 @@
 }
 
 .header__logo {
-    width: 100px;
+    width: 80px;
     object-fit: contain;
-    margin: 0 20px;
-    margin-top: 18px;
+    margin: 10px 20px;
+    margin-top: 10px;
 }
 
 /* .header__search {
@@ -48,7 +48,7 @@
 
 .header__nav {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-between;
     align-items: center;
     cursor: pointer;
     margin-right: 30px;

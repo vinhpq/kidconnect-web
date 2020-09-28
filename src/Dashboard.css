@@ -9,52 +9,43 @@
 .dashboard__option {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    margin-top: 40px;
+    justify-content: space-between;
+    margin-top: 20px;
 }
 
 
 .dashboard__info {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    /* width: 50%; */
-    /* margin-right: 100px; */
+    margin-bottom: 10px;
 }
 
-.dashboard__infoText {
-    display: flex;
-    flex-direction: column;
-    margin-left: 20px;
-    margin-right: 20px;
-}
-
-.dashboard__infoTextLineOne {
-    font-size: 16px;
-    text-align: center;
-}
-
-.dashboard__infoTextLineTwo {
-    font-size: 24px;
-    font-weight: 500;
-    text-align: center;
-}
 
 .dashboard__control {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin-bottom: 20px;
 }
 
 .dashboard__selectControl {
-    margin-left: 20px;
+    margin-right: 10px;
+    margin-left: 10px;
+}
+
+.dashboard__action {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.dashboard__action > .MuiIconButton-colorPrimary {
+    color: #3a6a18;
 }
 
 .dashboard__attendanceCard {
     display: flex;
     justify-content: space-evenly;
     align-items: center;
-    margin-top: 40px;
+    margin-top: 20px;
     flex-wrap: wrap;
 }
 
@@ -62,39 +53,6 @@
     margin: 1em 0;
  }
 
-.dashboard__search {
-    display: flex;
-    width: 15%;
-    height: 48px;
-    align-items: center;
-    border-radius: 999px;
-    background-color: #eff2f5;
-    margin-right: 40px;
-    /* margin-left: 80px; */
-}
-
-.dashboard__searchInput {
-    /* height: 12px; */
-    padding: 20px;
-    border: none;
-    width: 100%;
-    background-color: transparent;
-    font-size: 16px;
-    outline-width: 0;
-}
-
-.dashboard__searchIcon {
-    margin-right: 20px;
-}
-
-.dashboard__button > button {
-    width: 80px;
-    background-color: #3a6a18;
-    text-transform: inherit !important;
-    margin-right: 20px;
-    margin-left: 20px;
-    color: white;
-}
 
 @media (max-width: 990px) {
     .dashboard__option {

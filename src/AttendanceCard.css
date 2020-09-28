@@ -7,7 +7,7 @@
 }
 
 .attendanceCard > img {
-    width: 30%;
+    width: 20%;
     border-radius: 50%;
     object-fit: contain;
     padding-top: 20px;

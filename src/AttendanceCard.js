@@ -7,13 +7,13 @@ import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 import "./AttendanceCard.css"
 
-function AttendanceCard({ status, kidId, kidName, kidNickname, kidImage }) {
+function AttendanceCard({ attendanceType, status, kidId, kidName, kidNickname, kidImage, ...props }) {
 
-    const [value, setValue] = useState(status.toString())
+    const [value, setValue] = useState(status)
 
     const handleChange = (e) => {
-        console.log('e.target.value >>>', e.target.value)
-        setValue(e.target.value);
+        setValue(parseInt(e.target.value));
+        props.onClick(kidId, parseInt(e.target.value));
     }
 
     return (
@@ -24,15 +24,25 @@ function AttendanceCard({ status, kidId, kidName, kidNickname, kidImage }) {
                 <p>{kidNickname}</p>
 
                 {/* <h2 className={`infoBox__cases ${!isRed && "infoBox__cases--green"}`}>{cases}</h2> */}
-
-                <FormControl component="fieldset">
-                    <RadioGroup row value={value} onChange={handleChange}>
-                        <FormControlLabel value="1" control={<Radio />} label="Đã tới"/>
-                        <FormControlLabel value="0" control={<Radio />} label="Chưa tới" />
-                        <FormControlLabel value="2" control={<Radio />} label="Báo nghỉ"/>
-                    </RadioGroup>
-                </FormControl>
-                
+                {
+                    attendanceType == '1' ? (
+                        <FormControl component="fieldset">
+                            <RadioGroup row value={value} onChange={handleChange} name={kidId}>
+                                <FormControlLabel value={1} control={<Radio />} label="Đã tới"/>
+                                <FormControlLabel value={0} control={<Radio />} label="Chưa tới" />
+                                <FormControlLabel value={2} control={<Radio />} label="Báo nghỉ"/>
+                            </RadioGroup>
+                        </FormControl>
+                    ) : (
+                        <FormControl component="fieldset">
+                            <RadioGroup row value={value} onChange={handleChange}>
+                                <FormControlLabel value={1} control={<Radio />} label="Chưa về"/>
+                                <FormControlLabel value={3} control={<Radio />} label="Đã về" />
+                                <FormControlLabel value={4} control={<Radio />} label="Đón muộn"/>
+                            </RadioGroup>
+                        </FormControl>
+                    )
+                }
             </CardContent>
         </Card>
     )
