@@ -1,0 +1,9 @@
+.attendanceAction {
+    display: flex;
+}
+
+.attendanceAction > .MuiButton-root	{
+    background-color: green;
+    text-transform: inherit !important;
+    color: white;
+}
