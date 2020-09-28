@@ -19,28 +19,38 @@ function AttendanceCard({ attendanceType, status, kidId, kidName, kidNickname, k
     return (
         <Card>
             <CardContent className="attendanceCard">
-                <img src={kidImage} alt={kidName} />
-                <h2>{kidName}</h2>
-                <p>{kidNickname}</p>
+                <div className="attendanceCard__info">
+                    <img src={kidImage} alt={kidName} />
+                    <div className="attendanceCard__name">
+                        <h2>{kidName}</h2>
+                        <p>{kidNickname}</p>
+                    </div>
+                </div>
+                
+                
 
                 {/* <h2 className={`infoBox__cases ${!isRed && "infoBox__cases--green"}`}>{cases}</h2> */}
                 {
                     attendanceType == '1' ? (
-                        <FormControl component="fieldset">
-                            <RadioGroup row value={value} onChange={handleChange} name={kidId}>
-                                <FormControlLabel value={1} control={<Radio />} label="Đã tới"/>
-                                <FormControlLabel value={0} control={<Radio />} label="Chưa tới" />
-                                <FormControlLabel value={2} control={<Radio />} label="Báo nghỉ"/>
-                            </RadioGroup>
-                        </FormControl>
+                        <div className='attendanceCard__data'>
+                            <FormControl component="fieldset">
+                                <RadioGroup row value={value} onChange={handleChange} name={kidId}>
+                                    <FormControlLabel value={1} control={<Radio />} label="Đã tới"/>
+                                    <FormControlLabel value={0} control={<Radio />} label="Chưa tới" />
+                                    <FormControlLabel value={2} control={<Radio />} label="Báo nghỉ"/>
+                                </RadioGroup>
+                            </FormControl>
+                        </div>
                     ) : (
-                        <FormControl component="fieldset">
-                            <RadioGroup row value={value} onChange={handleChange}>
-                                <FormControlLabel value={1} control={<Radio />} label="Chưa về"/>
-                                <FormControlLabel value={3} control={<Radio />} label="Đã về" />
-                                <FormControlLabel value={4} control={<Radio />} label="Đón muộn"/>
-                            </RadioGroup>
-                        </FormControl>
+                        <div className='attendanceCard__data'>
+                            <FormControl component="fieldset">
+                                <RadioGroup row value={value} onChange={handleChange}>
+                                    <FormControlLabel value={1} control={<Radio />} label="Chưa về"/>
+                                    <FormControlLabel value={3} control={<Radio />} label="Đã về" />
+                                    <FormControlLabel value={4} control={<Radio />} label="Đón muộn"/>
+                                </RadioGroup>
+                            </FormControl>
+                        </div>
                     )
                 }
             </CardContent>

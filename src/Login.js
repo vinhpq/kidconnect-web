@@ -1,15 +1,37 @@
-import React from 'react'
+import React, {useState} from 'react'
 import { Button } from "@material-ui/core";
 import { auth, provider } from "./firebase";
 import { useStateValue } from "./StateProvider";
 import { actionTypes } from "./Reducer";
+import { useHistory } from 'react-router-dom';
 import db from "./firebase";
 import "./Login.css"
 
 function Login() {
     const [state, dispatch] = useStateValue();
+    const history = useHistory();
 
-    const signIn = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
+    const signInWithEmail = e => {
+        e.preventDefault();
+        auth
+            .signInWithEmailAndPassword(email, password)
+            .then((auth) => {
+                console.log(auth);
+                dispatch({
+                    type: actionTypes.SET_USER,
+                    user: auth.user,
+                })
+            })
+            .catch((error) => {
+                alert(error.message);
+            })
+    }
+
+
+    const signInWithGoogle = () => {
         auth
             .signInWithPopup(provider)
             .then((result) => {
@@ -18,19 +40,55 @@ function Login() {
                     type: actionTypes.SET_USER,
                     user: result.user,
                 })
+                history.push('/')
             })
             .catch((error) => {
                 alert(error.message);
             })
     }
 
+    const registerWithEmail = e => {
+        e.preventDefault();
+        auth
+            .createUserWithEmailAndPassword(email, password)
+            .then((auth) => {
+                if (auth) {
+                    history.push('/')
+                }
+            })
+            .catch(error => alert(error.message))
+
+    }
+
     return (
         <div className="login">
-            <div className="login__logo">
-                <img src="https://vectorlogo4u.com/wp-content/uploads/2019/06/facebook-icon-2019-logo-720x340.png" alt="" />
-                <img src="https://www.logo.wine/a/logo/Facebook/Facebook-Logo.wine.svg" alt="" />
+            <img
+                className="login__logo"
+                src="https://files.slack.com/files-pri/TN44SBSKE-F01ATQ9K0NA/l5-face_profile.jpg"
+                alt="BTM logo"
+            />
+            
+            <div className="login__container">
+                <h2>Đăng nhập</h2>
+                <form action="">
+                    <h5>E-mail</h5>
+                    <input type="text" value={email} onChange={(e) => setEmail(e.target.value)} />
+
+                    <h5>Mật khẩu</h5>
+                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+
+                    <button onClick={signInWithEmail}  className='login__signInButton'>Đăng nhập</button>
+                </form>
+
+                <button type="submit" onClick={signInWithGoogle} className='login__signInButton'>Đăng nhập với Google</button>
+
+                <p>
+                    By continuing, you agree to NBS's Conditions of Use and Privacy Notice.
+                </p>
+                <button onClick={registerWithEmail} className='login__registerButton'>Tạo tài khoản</button>
+                
             </div>
-            <Button type="submit" onClick={signIn}>Sign in with Google</Button>
+            
         </div>    )
 }
 
