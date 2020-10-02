@@ -25,7 +25,6 @@
 .attendanceCard__info {
     display: flex;
     align-items: center;
-    border-bottom: 1px solid #dfdfdf;
 }
 
 .attendanceCard__name {
@@ -33,5 +32,8 @@
 }
 
 .attendanceCard__data {
-    margin-top: 5px;
+    margin-top: 10px;
+    padding-top: 3px;
+    height: 20px;
+    border-top: 1px solid #dfdfdf;
 }

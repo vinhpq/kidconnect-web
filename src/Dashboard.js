@@ -1,23 +1,19 @@
 import React, { useState, useEffect } from 'react'
-import SearchIcon from "@material-ui/icons/Search"
 import "./Dashboard.css"
-import { MenuItem, FormControlLabel, FormControl, FormLabel, Select, IconButton, Button, FormGroup, RadioGroup, Radio, Checkbox } from "@material-ui/core";
+import { MenuItem, Select } from "@material-ui/core";
 import AttendanceCard from "./AttendanceCard"
 import db from "./firebase"
-import { classInfoTest, kidInfoTest, kidStatusTest } from "./Testdata"
-import FilterBox from "./FilterBox"
-import SyncIcon from '@material-ui/icons/Sync';
-import CloudUploadIcon from '@material-ui/icons/CloudUpload';
+import { classInfoTest, kidInfoTest } from "./Testdata"
 import AttendanceInfo from './AttendanceInfo';
 import AttendanceAction from './AttendanceAction';
 
 function Dashboard() {
     const [classInfo, setClasseInfo] = useState(classInfoTest);
     const [classId, setClassId] = useState(0);
-    const [kidInfo, setKidInfo] = useState([kidInfoTest]);
+    const [kidInfo, setKidInfo] = useState([]);
     const [checkAttendanceType, setCheckAttendanceType] = useState('1')
     const [attendanceInfo, setAttendanceInfo] = useState([])
-    const [currentFilterOption, setCurrentFilterOption] = useState(1000);
+    const [currentFilterOption, setCurrentFilterOption] = useState();
     const [classTotal, setClassTotal] = useState(0)
     
     // const getMapFromArray = data => data.reduce((acc, item) => {
@@ -25,26 +21,80 @@ function Dashboard() {
     //     return acc;
     // }, {})
 
-    // useEffect(() => {
-    //     db
-    //         .collection('School')
-    //         .doc('irKMMhRi62L5zljT7qc7')
-    //         .collection('Kid')
-    //         .where('status', 'in', [0, 2])
-    //         .onSnapshot(snapshot => {
-    //             // console.log('Kid >>>', snapshot.docs.map(doc => doc.data()));
-    //             setKidInfo(snapshot.docs.map(doc => ({
-    //                 kidId: doc.data().kidId,
-    //                 name: doc.data().name,
-    //                 nickname: doc.data().nickName,
-    //                 classId: doc.data().classId,
-    //                 attendanceStatus: doc.data().activeStatus,
-    //                 activeStatus: doc.data().status,
-    //             })));
-    //     })
+    const getKidInfoByClassId = async (classId, filterOption) => {
+        const queryRef =  classId === 1000 ? (
+                await db.collection('School')
+                .doc('irKMMhRi62L5zljT7qc7')
+                .collection('Kid')
+                .where('status', '==', 0)
+            ) : ( 
+                await db.collection('School')
+                .doc('irKMMhRi62L5zljT7qc7')
+                .collection('Kid')
+                .where('status', '==', 0)
+                .where('classId', '==', classId)
+            )
         
-    // }, []); 
+        const snapshot = filterOption === 1000 ? ( await queryRef.get() ) : ( await queryRef.where('activeStatus', '==', filterOption).get() )
+        
+        if (snapshot.empty) {
+            console.log('No matching document')
+            return null;
+        }  
+        
+        const kidInfoByClass = []
+        snapshot.forEach(doc => {
+            kidInfoByClass.push({
+                docId: doc.id,
+                kidId: doc.data().kidId,
+                name: doc.data().name,
+                nickname: doc.data().nickName,
+                classId: doc.data().classId,
+                attendanceStatus: doc.data().activeStatus,
+                activeStatus: doc.data().status,
+        })})
 
+        return kidInfoByClass
+    }
+
+    useEffect(() => {
+        async function fetchData() {
+            await db.collection('School')
+            .doc('irKMMhRi62L5zljT7qc7')
+            .collection('Kid')
+            .where('status', '==', 0)
+            .where('classId', '==', classId)
+            .onSnapshot(snapshot => {
+                const kidInfoByClass = snapshot.docs.map(doc => ({
+                    docId: doc.id,
+                    kidId: doc.data().kidId,
+                    name: doc.data().name,
+                    nickname: doc.data().nickName,
+                    classId: doc.data().classId,
+                    attendanceStatus: doc.data().activeStatus,
+                    activeStatus: doc.data().status,
+                }));
+
+                setKidInfo(kidInfoByClass)
+                setClassTotal(kidInfoByClass.length)
+                setAttendanceInfo({
+                    arrivedNum: kidInfoByClass.filter(item => item.attendanceStatus === 1).length,
+                    notArrivedNum: kidInfoByClass.filter(item => item.attendanceStatus === 0).length,
+                    absenceNum: kidInfoByClass.filter(item => item.attendanceStatus === 2).length,
+                    notLeavedNum: kidInfoByClass.filter(item => item.attendanceStatus === 1).length,
+                    leavedNum: kidInfoByClass.filter(item => item.attendanceStatus === 3).length,
+                    pickedUpLateNum: kidInfoByClass.filter(item => item.attendanceStatus === 4).length,
+                })
+            })
+        }
+
+        console.log('inside useEffect() classId: ', classId)
+
+        fetchData();
+        
+    }, [classId]); 
+
+    // console.log('KidInfo >>> ', kidInfo)
     // useEffect(() => {
     //     db
     //         .collection('School')
@@ -60,44 +110,10 @@ function Dashboard() {
     //     })
         
     // }, []);
-    
-    // console.log('KIDINFO >>>', kidInfo)
-
-    useEffect(() => {
-        const kidInfoByClass = kidInfoTest.filter(item => item.classId === classId)
-
-        setClassId(classId);
-        setKidInfo(kidInfoByClass);
-        setClassTotal(kidInfoByClass.length)
-        
-        setAttendanceInfo({
-            arrivedNum: kidInfoByClass.filter(item => item.attendanceStatus === 1).length,
-            notArrivedNum: kidInfoByClass.filter(item => item.attendanceStatus === 0).length,
-            absenceNum: kidInfoByClass.filter(item => item.attendanceStatus === 2).length,
-            notLeavedNum: kidInfoByClass.filter(item => item.attendanceStatus === 1).length,
-            leavedNum: kidInfoByClass.filter(item => item.attendanceStatus === 3).length,
-            pickedUpLateNum: kidInfoByClass.filter(item => item.attendanceStatus === 4).length,
-        })
-    },[])
 
 
     const onClassChange = (event) => {
-        console.log('onClassChange Event value >>> ', event.target.value)
-
-        const kidInfoByClass = event.target.value === 'classAll' ? kidInfoTest : kidInfoTest.filter(item => item.classId === event.target.value)
-
-        setClassId(event.target.value);
-        setKidInfo(kidInfoByClass);
-        setClassTotal(kidInfoByClass.length)
-
-        setAttendanceInfo({
-            arrivedNum: kidInfoByClass.filter(item => item.attendanceStatus === 1).length,
-            notArrivedNum: kidInfoByClass.filter(item => item.attendanceStatus === 0).length,
-            absenceNum: kidInfoByClass.filter(item => item.attendanceStatus === 2).length,
-            notLeavedNum: kidInfoByClass.filter(item => item.attendanceStatus === 1).length,
-            leavedNum: kidInfoByClass.filter(item => item.attendanceStatus === 3).length,
-            pickedUpLateNum: kidInfoByClass.filter(item => item.attendanceStatus === 4).length,
-        })
+        setClassId(event.target.value)
     }
     
 
@@ -108,69 +124,60 @@ function Dashboard() {
         setCurrentFilterOption(1000);
     }
 
-    const setFilterOption = (filterStatusValue) => {
-        console.log('setFilterOption filterStatusValue >>>', filterStatusValue)
+    const setFilterOption = (filterOptionValue) => {
+        console.log('setFilterOption  >>>', filterOptionValue)
+        const snapshot = getKidInfoByClassId(classId, filterOptionValue).then(
+            kidInfoByClass => {
+                console.log(kidInfoByClass)
+                setKidInfo(kidInfoByClass)
+            },
 
-        const kidInfoByClass = classId === 'classAll' ? kidInfoTest : kidInfoTest.filter(item => item.classId === classId)
-        const updatedKidStatus = filterStatusValue === 1000 ? kidInfoByClass : kidInfoByClass.filter(item => item.attendanceStatus === filterStatusValue)
+            error => alert(error)
+        )
 
-        // Set AttendanceCard display
-        setKidInfo(updatedKidStatus);
-        setCurrentFilterOption(filterStatusValue);
+        setCurrentFilterOption(filterOptionValue);
     }
 
-    const handleAttendanceStatusChange = (kidId, value) => {
-        console.log('handleAttendanceStatusChange >>> ', kidId, value)
+    const handleAttendanceStatusChange = async (docId, value) => {
+        console.log('handleAttendanceStatusChange >>> ', value)
 
-        const kidInfoByClass = classId === 'classAll' ? kidInfoTest : kidInfoTest.filter(item => item.classId === classId)
+
+        await db.collection('School')
+            .doc('irKMMhRi62L5zljT7qc7')
+            .collection('Kid')
+            .doc(docId)
+            .update({ activeStatus: value })
+            .then(() => {
+                console.log('Added successfully for classId: ', classId)
+                const snapshot = getKidInfoByClassId(classId, 1000).then(
+                    kidInfoByClass => {
+                        // console.log(kidInfoByClass)
+                        setKidInfo(currentFilterOption === 1000 ? kidInfoByClass : kidInfoByClass.filter(item => item.attendanceStatus === currentFilterOption))
+                        setAttendanceInfo({
+                            arrivedNum: kidInfoByClass.filter(item => item.attendanceStatus === 1).length,
+                            notArrivedNum: kidInfoByClass.filter(item => item.attendanceStatus === 0).length,
+                            absenceNum: kidInfoByClass.filter(item => item.attendanceStatus === 2).length,
+                            notLeavedNum: kidInfoByClass.filter(item => item.attendanceStatus === 1).length,
+                            leavedNum: kidInfoByClass.filter(item => item.attendanceStatus === 3).length,
+                            pickedUpLateNum: kidInfoByClass.filter(item => item.attendanceStatus === 4).length,
+                        })
+                    },
         
+                    error => alert(error)
+                )
+            })
 
-        const updatedKidInfo = kidInfoByClass.map(item => {
-            if (item.classId === classId && item.kidId === kidId) {
-                item.attendanceStatus = value;
-            }
-
-            return item;
-        })
-
-        // Set AttendanceCard display
-        setKidInfo(currentFilterOption === 1000 ? updatedKidInfo : updatedKidInfo.filter(item => item.attendanceStatus === currentFilterOption))
-
-        // Set AttendanceInfo display
-        setAttendanceInfo({
-            arrivedNum: updatedKidInfo.filter(item => item.attendanceStatus === 1).length,
-            notArrivedNum: updatedKidInfo.filter(item => item.attendanceStatus === 0).length,
-            absenceNum: updatedKidInfo.filter(item => item.attendanceStatus === 2).length,
-            notLeavedNum: updatedKidInfo.filter(item => item.attendanceStatus === 1).length,
-            leavedNum: updatedKidInfo.filter(item => item.attendanceStatus === 3).length,
-            pickedUpLateNum: updatedKidInfo.filter(item => item.attendanceStatus === 4).length,
-        })
+        // db.collection('School')
+        //     .doc('irKMMhRi62L5zljT7qc7')
+        //     .collection('KidAttendance')
+        //     .doc(docId)
+        //     .update({
+        //         status: value,
+        //         // timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        //     })
     }
 
-    // const setCheckOption = (e) => {
-    //     console.log('setCheckOption >>> ', e)
-    // }
-
-    // useEffect(() => {
-    //     db
-    //         .collection('School')
-    //         .doc('irKMMhRi62L5zljT7qc7')
-    //         .collection('KidAttendance')
-    //         .orderBy('classId')
-    //         .onSnapshot(snapshot => {
-    //             console.log('KidAttendance >>> ', snapshot.docs.map(doc => doc.data()));
-    //             setKidStatus(snapshot.docs.map(doc => ({
-    //                 classId: doc.data().classId,
-    //                 kidId: doc.data().kidId,
-    //                 status: doc.data().status,
-    //             })));
-    //     })        
-    // }, []);
-
-
-    // console.log('KIDINFO >>>', kidInfo)
-    // console.log('classTotal: ', classTotal)
-    
+    console.log('start to render... ')
 
     return (
         <div className='dashboard'>
@@ -188,7 +195,7 @@ function Dashboard() {
                         {classInfo.map((item) => (
                             <MenuItem key={item.classId} value={item.classId}>{item.name}</MenuItem>
                         ))}
-                        <MenuItem value="classAll">Hiển thị toàn trường</MenuItem>
+                        <MenuItem value={1000}>Hiển thị toàn trường</MenuItem>
                     
                     </Select>
                 </div>
@@ -209,13 +216,13 @@ function Dashboard() {
             </div>
 
             <div className="dashboard__attendanceCard">
-                {kidInfo?.map(({ attendanceStatus, kidId, name, nickname }) => (
+                {kidInfo?.map(({ attendanceStatus, kidId, docId, name, nickname }) => (
                         <AttendanceCard
                             key={kidId}
                             attendanceType={checkAttendanceType}
                             onClick={(p, e) => handleAttendanceStatusChange(p, e)}
                             status={attendanceStatus}
-                            kidId={kidId}
+                            docId={docId}
                             kidName={name}
                             kidNickname={nickname}
                             kidImage='https://ca.slack-edge.com/TN44SBSKE-UMRR4P6US-e39c5c386636-512'

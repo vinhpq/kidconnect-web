@@ -5,6 +5,7 @@ import { Button } from "@material-ui/core"
 function AttendanceInfo({ total, attendanceType, attendanceInfo, ...props }) {
 
     const handleClick = (e) => {
+        e.preventDefault()
         props.onClick(parseInt(e.currentTarget.id));
     }
 

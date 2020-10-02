@@ -1,19 +1,19 @@
 import React, { useState } from 'react'
-import { Card, CardContent, Typography } from "@material-ui/core";
+import { Card, CardContent } from "@material-ui/core";
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
-import FormLabel from '@material-ui/core/FormLabel';
 import "./AttendanceCard.css"
 
-function AttendanceCard({ attendanceType, status, kidId, kidName, kidNickname, kidImage, ...props }) {
+function AttendanceCard({ attendanceType, status, kidId, docId, kidName, kidNickname, kidImage, ...props }) {
 
     const [value, setValue] = useState(status)
 
     const handleChange = (e) => {
+        e.preventDefault()
         setValue(parseInt(e.target.value));
-        props.onClick(kidId, parseInt(e.target.value));
+        props.onClick(docId, parseInt(e.target.value));
     }
 
     return (
