@@ -1,16 +1,16 @@
 const classInfoTest = [
-    {classId: 0, name: "Rabbit", total: 31},
-    {classId: 1, name: "Chicken", total: 41},
-    {classId: 2, name: "Elephant", total: 46},
-    {classId: 3, name: "Zebra", total: 38},
-    {classId: 4, name: "Mickey", total: 48},
-    {classId: 5, name: "Monkey", total: 35},
-    {classId: 6, name: "Lion", total: 36},
-    {classId: 7, name: "Panda", total: 40},
-    {classId: 8, name: "Kangaroo", total: 63},
-    {classId: 9, name: "Donald", total: 67},
-    {classId: 10, name: "Bear", total: 10},
-    {classId: 11, name: "Kitty", total: 5},
+    {classId: 0, name: "Rabbit", total: 14, phone1: '0398900426@nbs.com', phone2: '0348560000@nbs.com'},
+    {classId: 1, name: "Chicken", total: 17, phone1: '0328524938@nbs.com', phone2: '000000000@nbs.com'},
+    {classId: 2, name: "Elephant", total: 25, phone1: '0986228299@nbs.com', phone2: '0356186278@nbs.com'},
+    {classId: 3, name: "Zebra", total: 21, phone1: '0981683792@nbs.com', phone2: '0367989894@nbs.com'},
+    {classId: 4, name: "Mickey", total: 11, phone1: '0383687298@nbs.com', phone2: '0966047659@nbs.com'},
+    // {classId: 5, name: "Monkey", total: 35, phone1: '0383687298@nbs.com', phone2: '0966047659@nbs.com'},
+    {classId: 6, name: "Lion", total: 13, phone1: '0982918276@nbs.com', phone2: '0368483679@nbs.com'},
+    {classId: 7, name: "Panda", total: 18, phone1: '0365639522@nbs.com', phone2: '0968622630@nbs.com'},
+    {classId: 8, name: "Kangaroo", total: 6, phone1: '0326721796@nbs.com', phone2: '0975180359@nbs.com'},
+    {classId: 9, name: "Donald", total: 5, phone1: '0355557869@nbs.com', phone2: '0326670097@nbs.com'},
+    // {classId: 10, name: "Bear", total: 10, phone1: '0383687298@nbs.com', phone2: '0966047659@nbs.com'},
+    // {classId: 11, name: "Kitty", total: 5, phone1: '0383687298@nbs.com', phone2: '0966047659@nbs.com'},
 ];
 
 const kidInfoTest = [

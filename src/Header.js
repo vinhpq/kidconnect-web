@@ -2,15 +2,17 @@ import React from 'react'
 import "./Header.css";
 import SearchIcon from "@material-ui/icons/Search"
 import { Avatar } from "@material-ui/core";
-import { Link } from "react-router-dom"
+import { Link, useHistory } from "react-router-dom"
 import { useStateValue } from "./StateProvider"
 import { auth } from "./firebase"
 
 function Header() {
     const [{ user }, dispatch] = useStateValue();
+    // const history = useHistory();
 
     const handleAuthentication = () => {
       if (user) {
+          console.log('sign out...')
         auth.signOut();
       }
     }
@@ -18,6 +20,8 @@ function Header() {
     const searchChange = (event) => {
         console.log('event >>', event.target.value)
     }
+
+    // console.log(user)
 
     return (
         <div className="header">

@@ -4,7 +4,7 @@ import { auth, provider } from "./firebase";
 import { useStateValue } from "./StateProvider";
 import { actionTypes } from "./Reducer";
 import { useHistory } from 'react-router-dom';
-import db from "./firebase";
+import firebase from "firebase";
 import "./Login.css"
 
 function Login() {
@@ -16,8 +16,8 @@ function Login() {
 
     const signInWithEmail = e => {
         e.preventDefault();
-        auth
-            .signInWithEmailAndPassword(email, password)
+        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).then(() => {
+            auth.signInWithEmailAndPassword(email.concat("@nbs.com"), password)
             .then((auth) => {
                 console.log(auth);
                 dispatch({
@@ -28,6 +28,7 @@ function Login() {
             .catch((error) => {
                 alert(error.message);
             })
+        }).catch(err => console.log(err))
     }
 
 
@@ -50,7 +51,7 @@ function Login() {
     const registerWithEmail = e => {
         e.preventDefault();
         auth
-            .createUserWithEmailAndPassword(email, password)
+            .createUserWithEmailAndPassword(email.concat("@nbs.com"), password)
             .then((auth) => {
                 if (auth) {
                     history.push('/')
@@ -71,7 +72,7 @@ function Login() {
             <div className="login__container">
                 <h2>Đăng nhập</h2>
                 <form action="">
-                    <h5>E-mail</h5>
+                    <h5>Tên đăng nhập</h5>
                     <input type="text" value={email} onChange={(e) => setEmail(e.target.value)} />
 
                     <h5>Mật khẩu</h5>
@@ -80,7 +81,7 @@ function Login() {
                     <button onClick={signInWithEmail}  className='login__signInButton'>Đăng nhập</button>
                 </form>
 
-                <button type="submit" onClick={signInWithGoogle} className='login__signInButton'>Đăng nhập với Google</button>
+                {/* <button type="submit" onClick={signInWithGoogle} className='login__signInButton'>Đăng nhập với Google</button> */}
 
                 <p>
                     By continuing, you agree to NBS's Conditions of Use and Privacy Notice.

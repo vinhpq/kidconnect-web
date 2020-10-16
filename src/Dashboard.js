@@ -6,15 +6,18 @@ import db from "./firebase"
 import { classInfoTest, kidInfoTest } from "./Testdata"
 import AttendanceInfo from './AttendanceInfo';
 import AttendanceAction from './AttendanceAction';
+import { useStateValue } from "./StateProvider"
 
 function Dashboard() {
-    const [classInfo, setClasseInfo] = useState(classInfoTest);
-    const [classId, setClassId] = useState(0);
+    const [classInfo, setClassInfo] = useState(null);
+    const [classId, setClassId] = useState(9999);
     const [kidInfo, setKidInfo] = useState([]);
     const [checkAttendanceType, setCheckAttendanceType] = useState('1')
     const [attendanceInfo, setAttendanceInfo] = useState([])
-    const [currentFilterOption, setCurrentFilterOption] = useState();
+    const [currentFilterOption, setCurrentFilterOption] = useState(1000);
     const [classTotal, setClassTotal] = useState(0)
+
+    const [{ user }, dispatch] = useStateValue();
     
     // const getMapFromArray = data => data.reduce((acc, item) => {
     //     acc[item.kidId] = {name: item.name, nickname: item.nickname};
@@ -58,22 +61,86 @@ function Dashboard() {
     }
 
     useEffect(() => {
+        if (user.email === 'demo@nbs.com') {
+            setClassInfo(classInfoTest)
+            setClassId(classInfoTest[0].classId)
+            // setClassTotal(classInfoTest[0].total)
+        } else {
+            const _classInfo = classInfoTest.filter(item => item.phone1 === user.email || item.phone2 === user.email)
+            if (_classInfo) {
+                setClassInfo(_classInfo)
+                setClassId(_classInfo[0].classId)
+                // setClassTotal(_classInfo[0].total)
+            } else {
+                console.log('No matching classId..')
+            }
+        }
+    }, [])
+
+    useEffect(() => {
         async function fetchData() {
-            await db.collection('School')
-            .doc('irKMMhRi62L5zljT7qc7')
-            .collection('Kid')
-            .where('status', '==', 0)
-            .where('classId', '==', classId)
-            .onSnapshot(snapshot => {
-                const kidInfoByClass = snapshot.docs.map(doc => ({
-                    docId: doc.id,
-                    kidId: doc.data().kidId,
-                    name: doc.data().name,
-                    nickname: doc.data().nickName,
-                    classId: doc.data().classId,
-                    attendanceStatus: doc.data().activeStatus,
-                    activeStatus: doc.data().status,
-                }));
+            if (classId != 9999) {
+
+                const queryRef =  classId === 1000 ? (
+                    await db.collection('School')
+                    .doc('irKMMhRi62L5zljT7qc7')
+                    .collection('Kid')
+                    .where('status', '==', 0)
+                ) : ( 
+                    await db.collection('School')
+                    .doc('irKMMhRi62L5zljT7qc7')
+                    .collection('Kid')
+                    .where('status', '==', 0)
+                    .where('classId', '==', classId)
+                )
+
+                // await db.collection('School')
+                // .doc('irKMMhRi62L5zljT7qc7')
+                // .collection('Kid')
+                // .where('status', '==', 0)
+                // .where('classId', '==', classId)
+
+                // queryRef.onSnapshot(snapshot => {
+                //     const kidInfoByClass = snapshot.docs.map(doc => ({
+                //         docId: doc.id,
+                //         kidId: doc.data().kidId,
+                //         name: doc.data().name,
+                //         nickname: doc.data().nickName,
+                //         classId: doc.data().classId,
+                //         attendanceStatus: doc.data().activeStatus,
+                //         activeStatus: doc.data().status,
+                //     }));
+
+                //     setKidInfo(kidInfoByClass)
+                //     setClassTotal(kidInfoByClass.length)
+                //     setAttendanceInfo({
+                //         arrivedNum: kidInfoByClass.filter(item => item.attendanceStatus === 1).length,
+                //         notArrivedNum: kidInfoByClass.filter(item => item.attendanceStatus === 0).length,
+                //         absenceNum: kidInfoByClass.filter(item => item.attendanceStatus === 2).length,
+                //         notLeavedNum: kidInfoByClass.filter(item => item.attendanceStatus === 1).length,
+                //         leavedNum: kidInfoByClass.filter(item => item.attendanceStatus === 3).length,
+                //         pickedUpLateNum: kidInfoByClass.filter(item => item.attendanceStatus === 4).length,
+                //     })
+                // })
+
+                const snapshot = await queryRef.get()
+
+                if (snapshot.empty) {
+                    console.log('No matching document')
+                    return null;
+                }  
+
+                const kidInfoByClass = []
+                snapshot.forEach(doc => {
+                    kidInfoByClass.push({
+                        docId: doc.id,
+                        kidId: doc.data().kidId,
+                        name: doc.data().name,
+                        nickname: doc.data().nickName,
+                        classId: doc.data().classId,
+                        attendanceStatus: doc.data().activeStatus,
+                        activeStatus: doc.data().status,
+                })})
 
                 setKidInfo(kidInfoByClass)
                 setClassTotal(kidInfoByClass.length)
@@ -85,7 +152,8 @@ function Dashboard() {
                     leavedNum: kidInfoByClass.filter(item => item.attendanceStatus === 3).length,
                     pickedUpLateNum: kidInfoByClass.filter(item => item.attendanceStatus === 4).length,
                 })
-            })
+                
+            }
         }
 
         console.log('inside useEffect() classId: ', classId)
@@ -94,7 +162,6 @@ function Dashboard() {
         
     }, [classId]); 
 
-    // console.log('KidInfo >>> ', kidInfo)
     // useEffect(() => {
     //     db
     //         .collection('School')
@@ -127,22 +194,16 @@ function Dashboard() {
     const setFilterOption = (filterOptionValue) => {
         console.log('setFilterOption  >>>', filterOptionValue)
         const snapshot = getKidInfoByClassId(classId, filterOptionValue).then(
-            kidInfoByClass => {
-                console.log(kidInfoByClass)
-                setKidInfo(kidInfoByClass)
-            },
-
+            kidInfoByClass => { setKidInfo(kidInfoByClass) },
             error => alert(error)
         )
-
         setCurrentFilterOption(filterOptionValue);
     }
 
-    const handleAttendanceStatusChange = async (docId, value) => {
+    const handleAttendanceStatusChange = (docId, value) => {
         console.log('handleAttendanceStatusChange >>> ', value)
 
-
-        await db.collection('School')
+        db.collection('School')
             .doc('irKMMhRi62L5zljT7qc7')
             .collection('Kid')
             .doc(docId)
@@ -150,8 +211,7 @@ function Dashboard() {
             .then(() => {
                 console.log('Added successfully for classId: ', classId)
                 const snapshot = getKidInfoByClassId(classId, 1000).then(
-                    kidInfoByClass => {
-                        // console.log(kidInfoByClass)
+                    kidInfoByClass => { 
                         setKidInfo(currentFilterOption === 1000 ? kidInfoByClass : kidInfoByClass.filter(item => item.attendanceStatus === currentFilterOption))
                         setAttendanceInfo({
                             arrivedNum: kidInfoByClass.filter(item => item.attendanceStatus === 1).length,
@@ -190,14 +250,21 @@ function Dashboard() {
                         <MenuItem value="1">Điểm danh đón</MenuItem>
                         <MenuItem value="0">Điểm danh về</MenuItem>
                     
-                    </Select>                                
-                    <Select className='dashboard__selectControl' varian="outlined" onChange={onClassChange} value={classId} >
-                        {classInfo.map((item) => (
-                            <MenuItem key={item.classId} value={item.classId}>{item.name}</MenuItem>
-                        ))}
-                        <MenuItem value={1000}>Hiển thị toàn trường</MenuItem>
-                    
                     </Select>
+                    {user.email === 'demo@nbs.com' ? (                          
+                        <Select className='dashboard__selectControl' varian="outlined" onChange={onClassChange} value={classId} >
+                            {classInfo?.map((item) => (
+                                <MenuItem key={item.classId} value={item.classId}>{item.name}</MenuItem>
+                            ))}
+                            <MenuItem value={1000}>Hiển thị toàn trường</MenuItem>                    
+                        </Select>
+                    ) : (
+                        <Select className='dashboard__selectControl' varian="outlined" onChange={onClassChange} value={classId} >
+                            {classInfo?.map((item) => (
+                                <MenuItem key={item.classId} value={item.classId}>{item.name}</MenuItem>
+                            ))}
+                        </Select>
+                    )}
                 </div>
 
                 <div className="dashboard__info">
@@ -225,7 +292,7 @@ function Dashboard() {
                             docId={docId}
                             kidName={name}
                             kidNickname={nickname}
-                            kidImage='https://ca.slack-edge.com/TN44SBSKE-UMRR4P6US-e39c5c386636-512'
+                            kidImage='./null.jpg'
                         />
                     ))} 
             </div>

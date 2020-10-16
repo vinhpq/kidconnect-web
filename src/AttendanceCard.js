@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Card, CardContent } from "@material-ui/core";
+import { Card, CardContent, Avatar } from "@material-ui/core";
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -20,7 +20,7 @@ function AttendanceCard({ attendanceType, status, kidId, docId, kidName, kidNick
         <Card>
             <CardContent className="attendanceCard">
                 <div className="attendanceCard__info">
-                    <img src={kidImage} alt={kidName} />
+                    <Avatar src={kidImage} alt={kidName} />
                     <div className="attendanceCard__name">
                         <h2>{kidName}</h2>
                         <p>{kidNickname}</p>

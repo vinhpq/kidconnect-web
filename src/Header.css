@@ -1,5 +1,5 @@
 .header {
-    height: auto;
+    height: 60px;
     width: 100vw;
     display: flex;
     align-items: center;
@@ -59,6 +59,7 @@
     flex-direction: column;
     margin-left: 20px;
     margin-right: 20px;
+    width: 75px;
     color: white;
     opacity: 0.7;
     transition: transform 50ms ease-out;
@@ -66,12 +67,12 @@
 
 .header__option:hover {
     opacity: 1;
-    transform: scale(1.2);
+    transform: scale(1.1);
 }
 
 .header__option--active {
     opacity: 1;
-    transform: scale(1.2);
+    transform: scale(1.1);
 }
 
 .header__optionLineOne {
