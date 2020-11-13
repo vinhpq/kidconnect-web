@@ -7,6 +7,8 @@ import { classInfoTest, kidInfoTest } from "./Testdata"
 import AttendanceInfo from './AttendanceInfo';
 import AttendanceAction from './AttendanceAction';
 import { useStateValue } from "./StateProvider"
+import CronBuilder from  'react-cron-builder'
+import 'react-cron-builder/dist/bundle.css'
 
 function Dashboard() {
     const [classInfo, setClassInfo] = useState(null);
@@ -237,7 +239,7 @@ function Dashboard() {
         //     })
     }
 
-    console.log('start to render... ')
+    console.log('start to render... ', kidInfo)
 
     return (
         <div className='dashboard'>
@@ -280,6 +282,11 @@ function Dashboard() {
                     checked={attendanceInfo.total === attendanceInfo.arrivedNum || attendanceInfo.total === attendanceInfo.leavedNum}
                     attendanceType={checkAttendanceType}
                 /> */}
+                <CronBuilder 
+                    cronExpression="12 16 * * *"
+                    onChange={console.log('Cron runs')}
+                    showResult={true}
+                />
             </div>
 
             <div className="dashboard__attendanceCard">
