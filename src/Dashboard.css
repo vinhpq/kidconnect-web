@@ -1,7 +1,6 @@
-
 .dashboard {
     /* background-image: url('./btm1.jpg') */
-    
+
 }
 
 .dashboard__option {
@@ -29,14 +28,22 @@
     margin-left: 10px;
 }
 
-.dashboard__action {
+/* .dashboard__action {
     display: flex;
     align-items: center;
     justify-content: space-between;
+} */
+
+.dashboard__action>.MuiButton-root {
+    background: #3a6a18;
+    color: white;
+    text-transform: none;
+    margin-left: 10px;
 }
 
-.dashboard__action > .MuiIconButton-colorPrimary {
-    color: #3a6a18;
+.dashboard__action>.MuiCircularProgress-root {
+    color: green;
+    position: absolute;
 }
 
 .dashboard__attendanceCard {
@@ -47,13 +54,13 @@
     flex-wrap: wrap;
 }
 
-.dashboard__attendanceCard > * {
+.dashboard__attendanceCard>* {
     margin: 0.5em 0;
- }
+}
 
 
 @media (max-width: 990px) {
     .dashboard__option {
-      flex-direction: column;
+        flex-direction: column;
     }
-  }
+}

@@ -1,0 +1,12 @@
+export const CLASS_ID_MAX = 9999;
+export const CLASS_ID_ALL = 1000;
+export const ATTENDANCE_TYPE_PICKUP = '1';
+export const ATTENDANCE_TYPE_LEAVE = '0';
+export const FILTER_OPTION_ALL = 1000;
+export const FILTER_OPTION_NOT_ARRIVED = 0;
+export const FILTER_OPTION_ARRIVED = 1;
+export const FILTER_OPTION_ABSENCE = 2;
+// export const FILTER_OPTION_NOT_LEAVED = 1;
+export const FILTER_OPTION_PICKUP_LATE = 3;
+export const FILTER_OPTION_LEAVED = 4;
+export const KID_STATUS_ACTIVE = 0;
