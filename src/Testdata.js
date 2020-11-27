@@ -4,7 +4,7 @@ const classInfoTest = [
     {classId: 2, name: "Elephant", total: 25, phone1: '0986228299@nbs.com', phone2: 'elephant@nbs.com'},
     {classId: 3, name: "Zebra", total: 21, phone1: '0981683792@nbs.com', phone2: 'zebra@nbs.com'},
     {classId: 4, name: "Mickey", total: 11, phone1: '0383687298@nbs.com', phone2: 'mickey@nbs.com'},
-    // {classId: 5, name: "Monkey", total: 35, phone1: '0383687298@nbs.com', phone2: '0966047659@nbs.com'},
+    {classId: 5, name: "Monkey", total: 35, phone1: '0383687298@nbs.com', phone2: 'monkey@nbs.com'},
     {classId: 6, name: "Lion", total: 13, phone1: '0982918276@nbs.com', phone2: 'lion@nbs.com'},
     {classId: 7, name: "Panda", total: 18, phone1: '0365639522@nbs.com', phone2: 'panda@nbs.com'},
     {classId: 8, name: "Kangaroo", total: 6, phone1: '0326721796@nbs.com', phone2: 'kangaroo@nbs.com'},

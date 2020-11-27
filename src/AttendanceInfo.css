@@ -2,8 +2,8 @@
     display: flex;
 }
 
-.attendanceInfo > .MuiButton-outlined {
-    width: 85px;
+.attendanceInfo>.MuiButton-outlined {
+    width: 92px;
     text-transform: inherit !important;
     margin-left: 5px;
     margin-right: 5px;

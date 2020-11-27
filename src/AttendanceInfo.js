@@ -54,7 +54,9 @@ function AttendanceInfo({ total, attendanceType, attendanceInfo, ...props }) {
             <div className="attendanceInfo__infoText">
               <span className="attendanceInfo__infoTextLineOne"> Đã tới </span>
               <span className="attendanceInfo__infoTextLineTwo">
-                {attendanceInfo.arrivedNum}
+                {attendanceInfo.arrivedNum +
+                  attendanceInfo.leavedNum +
+                  attendanceInfo.pickedUpLateNum}
               </span>
             </div>
           </Button>
@@ -80,10 +82,13 @@ function AttendanceInfo({ total, attendanceType, attendanceInfo, ...props }) {
             onClick={handleClick}
           >
             <div className="attendanceInfo__infoText">
-              <span className="attendanceInfo__infoTextLineOne">
-                Tổng đi học
+              <span className="attendanceInfo__infoTextLineOne">Tổng </span>
+              <span className="attendanceInfo__infoTextLineTwo">
+                {" "}
+                {attendanceInfo.arrivedNum +
+                  attendanceInfo.leavedNum +
+                  attendanceInfo.pickedUpLateNum}{" "}
               </span>
-              <span className="attendanceInfo__infoTextLineTwo">{total}</span>
             </div>
           </Button>
           <Button
@@ -93,7 +98,7 @@ function AttendanceInfo({ total, attendanceType, attendanceInfo, ...props }) {
             onClick={handleClick}
           >
             <div className="attendanceInfo__infoText">
-              <span className="attendanceInfo__infoTextLineOne"> Chưa về</span>
+              <span className="attendanceInfo__infoTextLineOne"> Chưa về </span>
               <span className="attendanceInfo__infoTextLineTwo">
                 {attendanceInfo.arrivedNum}
               </span>

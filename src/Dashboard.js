@@ -20,6 +20,9 @@ import {
   FILTER_OPTION_PICKUP_LATE,
   FILTER_OPTION_LEAVED,
   KID_STATUS_ACTIVE,
+  ACTION_PICKUP,
+  ACTION_LEAVE,
+  ACTION_RESET,
 } from "./types";
 
 function Dashboard() {
@@ -64,7 +67,16 @@ function Dashboard() {
 
     const snapshot =
       filterOption === FILTER_OPTION_ALL
-        ? await queryRef.get()
+        ? checkAttendanceType === ATTENDANCE_TYPE_PICKUP
+          ? await queryRef.get()
+          : await queryRef
+              .where("activeStatus", ">=", FILTER_OPTION_ARRIVED)
+              .get()
+        : filterOption === FILTER_OPTION_ARRIVED &&
+          checkAttendanceType === ATTENDANCE_TYPE_PICKUP
+        ? await queryRef
+            .where("activeStatus", ">=", FILTER_OPTION_ARRIVED)
+            .get()
         : await queryRef.where("activeStatus", "==", filterOption).get();
 
     if (snapshot.empty) {
@@ -225,16 +237,16 @@ function Dashboard() {
     console.log("onCheckAttendanceTypeChange >>>", event.target.value);
 
     setCheckAttendanceType(event.target.value);
-    setCurrentFilterOption(1000);
+    setCurrentFilterOption(FILTER_OPTION_ALL);
   };
 
   const setFilterOption = (filterOptionValue) => {
     console.log("setFilterOption  >>>", filterOptionValue);
-    const snapshot = getKidInfoByClassId(classId, filterOptionValue).then(
+    getKidInfoByClassId(classId, filterOptionValue).then(
       (kidInfoByClass) => {
         setKidInfo(kidInfoByClass);
       },
-      (error) => alert(error)
+      (error) => console.error(error)
     );
     setCurrentFilterOption(filterOptionValue);
   };
@@ -280,7 +292,7 @@ function Dashboard() {
             });
           },
 
-          (error) => alert(error)
+          (error) => console.error(error)
         );
       });
 
@@ -317,7 +329,10 @@ function Dashboard() {
     }
   };
 
-  console.log("start to render... ", kidInfo);
+  console.log(
+    "start to render... ",
+    kidInfo,
+  );
 
   return (
     <div className="dashboard">
@@ -387,20 +402,23 @@ function Dashboard() {
       </div>
 
       <div className="dashboard__attendanceCard">
-        {kidInfo?.map(({ attendanceStatus, kidId, docId, name, nickname }) => (
-          <AttendanceCard
-            key={kidId}
-            attendanceType={checkAttendanceType}
-            disablePickUp={disablePickUp}
-            disableLeave={disableLeave}
-            onClick={(p, e) => handleAttendanceStatusChange(p, e)}
-            status={attendanceStatus}
-            docId={docId}
-            kidName={name}
-            kidNickname={nickname}
-            kidImage="./null.jpg"
-          />
-        ))}
+        {kidInfo?.map(
+          ({ attendanceStatus, kidId, docId, name, nickname, classId }) => (
+            <AttendanceCard
+              key={kidId}
+              attendanceType={checkAttendanceType}
+              disablePickUp={disablePickUp}
+              disableLeave={disableLeave}
+              onClick={(p, e) => handleAttendanceStatusChange(p, e)}
+              status={attendanceStatus}
+              docId={docId}
+              kidName={name}
+              kidNickname={nickname}
+              className={classInfo[classId]?.name}
+              kidImage="./null.jpg"
+            />
+          )
+        )}
       </div>
     </div>
   );

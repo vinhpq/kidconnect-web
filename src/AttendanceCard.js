@@ -26,6 +26,7 @@ function AttendanceCard({
   kidName,
   kidNickname,
   kidImage,
+  className,
   ...props
 }) {
   // const [value, setValue] = useState(status)
@@ -42,7 +43,10 @@ function AttendanceCard({
         <div className="attendanceCard__info">
           <Avatar src={kidImage} alt={kidName} />
           <div className="attendanceCard__name">
-            <h2> {kidName} </h2> <p> {kidNickname} </p>
+            <h2> {kidName} </h2>
+            <p>
+              {className} {kidNickname ? `(${kidNickname})` : ""}
+            </p>
           </div>
         </div>
         {/* <h2 className={`infoBox__cases ${!isRed && "infoBox__cases--green"}`}>{cases}</h2> */}
@@ -51,9 +55,8 @@ function AttendanceCard({
             <FormControl component="fieldset">
               <RadioGroup
                 row
-                value={status}
+                value={status < 2 ? status : FILTER_OPTION_ARRIVED}
                 onChange={handleChange}
-                name={kidId}
               >
                 <FormControlLabel
                   value={FILTER_OPTION_ARRIVED}
