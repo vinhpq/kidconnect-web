@@ -11,6 +11,7 @@ import { classInfoTest, kidInfoTest } from "./Testdata";
 import AttendanceInfo from "./AttendanceInfo";
 import { useStateValue } from "./StateProvider";
 // import { kidInfo2Csv } from "./util"
+import DatePicker from "./DatePicker"
 import {
   CLASS_ID_MAX,
   CLASS_ID_ALL,
@@ -42,6 +43,7 @@ function Dashboard() {
   const [classTotal, setClassTotal] = useState(0);
 
   const [{ user }, dispatch] = useStateValue();
+  const [showSearch, setShowSearch] = useState(false);
 
   const Status2Text = ["Chưa tới", "Báo nghỉ", "Đã tới", "Đón muộn", "Đã về"];
 
@@ -232,7 +234,7 @@ const onCheckAttendanceTypeChange = (event) => {
             ))}
             <MenuItem value={FILTER_OPTION_ALL}>Hiển thị toàn trường</MenuItem>
           </Select>
-          
+
           <Select
             className="dashboard__selectControl"
             varian="outlined"
@@ -244,11 +246,12 @@ const onCheckAttendanceTypeChange = (event) => {
           </Select>
 
           <div className="dashboard__action">
+            {showSearch && <DatePicker />}
             <Button
               size="small"
               variant="contained"
               // startIcon={<CloudUploadIcon />}
-              onClick={handleButtonClick}
+              onClick={() => setShowSearch(!showSearch)}
             >
               {"Báo cáo"}
             </Button>
