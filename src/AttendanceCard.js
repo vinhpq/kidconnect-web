@@ -5,6 +5,7 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormControl from "@material-ui/core/FormControl";
 import "./AttendanceCard.css";
+import { useStateValue } from "./StateProvider";
 import {
   ATTENDANCE_TYPE_PICKUP,
   FILTER_OPTION_ALL,
@@ -18,8 +19,8 @@ import {
 
 function AttendanceCard({
   attendanceType,
-  disablePickUp,
-  disableLeave,
+  finishMorning,
+  finishDay,
   status,
   kidId,
   docId,
@@ -30,6 +31,7 @@ function AttendanceCard({
   ...props
 }) {
   // const [value, setValue] = useState(status)
+  const [{ user }, dispatch] = useStateValue();
 
   const handleChange = (e) => {
     // e.preventDefault()
@@ -43,10 +45,10 @@ function AttendanceCard({
         <div className="attendanceCard__info">
           <Avatar src={kidImage} alt={kidName} />
           <div className="attendanceCard__name">
-            <h2> {kidName} </h2>
-            <p>
-              {className} {kidNickname ? `(${kidNickname})` : ""}
-            </p>
+            <h2>
+              {kidName} {kidNickname ? `(${kidNickname})` : ""}
+            </h2>
+            <p>{className}</p>
           </div>
         </div>
         {/* <h2 className={`infoBox__cases ${!isRed && "infoBox__cases--green"}`}>{cases}</h2> */}
@@ -55,26 +57,42 @@ function AttendanceCard({
             <FormControl component="fieldset">
               <RadioGroup
                 row
-                value={status < 2 ? status : FILTER_OPTION_ARRIVED}
+                value={
+                  status < FILTER_OPTION_ARRIVED
+                    ? status
+                    : FILTER_OPTION_ARRIVED
+                }
                 onChange={handleChange}
               >
                 <FormControlLabel
                   value={FILTER_OPTION_ARRIVED}
                   control={<Radio />}
                   label="Đã tới"
-                  disabled={disablePickUp}
+                  disabled={
+                    user.email === "demo@nbs.com"
+                      ? true
+                      : finishMorning && status === FILTER_OPTION_ARRIVED
+                  }
                 />
                 <FormControlLabel
                   value={FILTER_OPTION_NOT_ARRIVED}
                   control={<Radio />}
                   label="Chưa tới"
-                  disabled={disablePickUp}
+                  disabled={
+                    user.email === "demo@nbs.com"
+                      ? true
+                      : finishMorning && status === FILTER_OPTION_ARRIVED
+                  }
                 />
                 <FormControlLabel
                   value={FILTER_OPTION_ABSENCE}
                   control={<Radio />}
                   label="Báo nghỉ"
-                  disabled={disablePickUp}
+                  disabled={
+                    user.email === "demo@nbs.com"
+                      ? true
+                      : finishMorning && status === FILTER_OPTION_ARRIVED
+                  }
                 />
               </RadioGroup>
             </FormControl>
@@ -87,19 +105,31 @@ function AttendanceCard({
                   value={FILTER_OPTION_ARRIVED}
                   control={<Radio />}
                   label="Chưa về"
-                  disabled={disableLeave}
+                  disabled={
+                    user.email === "demo@nbs.com"
+                      ? true
+                      : finishDay && status === FILTER_OPTION_LEAVED
+                  }
                 />
                 <FormControlLabel
                   value={FILTER_OPTION_LEAVED}
                   control={<Radio />}
                   label="Đã về"
-                  disabled={disableLeave}
+                  disabled={
+                    user.email === "demo@nbs.com"
+                      ? true
+                      : finishDay && status === FILTER_OPTION_LEAVED
+                  }
                 />
                 <FormControlLabel
                   value={FILTER_OPTION_PICKUP_LATE}
                   control={<Radio />}
                   label="Đón muộn"
-                  disabled={disableLeave}
+                  disabled={
+                    user.email === "demo@nbs.com"
+                      ? true
+                      : finishDay && status === FILTER_OPTION_LEAVED
+                  }
                 />
               </RadioGroup>
             </FormControl>

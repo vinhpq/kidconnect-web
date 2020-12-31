@@ -27,9 +27,9 @@ function Header() {
     setOpen(false)
     console.log(value)
 
-    if (value === 2) {
+    if (value === 1) {
       handleAuthentication();
-    } else if (value === 1) {
+    } else if (value === 0) {
       console.log('Setup profile')
     }
   }
@@ -65,15 +65,17 @@ function Header() {
 
       <div className="header__nav">
         <div className="header__option header__option--active">
-          <span className="header__optionLineOne">Xin chào</span>
-          <span className="header__optionLineTwo">{user?.email}</span>
+          <span className="header__optionLineOne">Xin chào,</span>
+          <span className="header__optionLineTwo">
+            {user?.email.substring(0, user?.email.lastIndexOf("@"))}
+          </span>
         </div>
         {/* <div className="header__option header__option--active">
           <span className="header__optionLineOne">Điểm danh</span>
           <span className="header__optionLineTwo">Học sinh</span>
-        </div> */}
+        </div>
 
-        {/* <div className="header__option">
+        <div className="header__option">
           <span className="header__optionLineOne">Điểm danh</span>
           <span className="header__optionLineTwo">Giáo viên</span>
         </div> */}
@@ -84,11 +86,11 @@ function Header() {
             alt={user?.displayName}
             src={user?.photoURL}
           />
-          {/* <ProfileDialog
+          <ProfileDialog
             // selectedValue={selectedValue}
             open={open}
-            onClose={handleClose}
-          /> */}
+            onClose={(e) => handleClose(e)}
+          />
         </div>
       </div>
     </div>

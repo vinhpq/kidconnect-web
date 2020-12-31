@@ -1,0 +1,75 @@
+.dashboard {
+    /* background-image: url('./btm1.jpg') */
+
+}
+
+.dashboard__option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+
+.dashboard__info {
+    margin-bottom: 10px;
+}
+
+
+.dashboard__control {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.dashboard__selectControl {
+    margin-right: 10px;
+    margin-left: 10px;
+}
+
+/* .dashboard__action {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+} */
+
+.dashboard__action>.MuiButton-root {
+    background: #3a6a18;
+    color: white;
+    text-transform: none;
+    margin-left: 5px;
+}
+
+.dashboard__action>.MuiCircularProgress-root {
+    color: green;
+    position: absolute;
+}
+
+.dashboard__action__export {
+    text-decoration: none;
+    margin-left: 10px;
+}
+
+.dashboard__action__export >.MuiButton-root {
+    text-transform: none;
+}
+
+.dashboard__attendanceCard {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.dashboard__attendanceCard>* {
+    margin: 0.5em 0;
+}
+
+
+@media (max-width: 990px) {
+    .dashboard__option {
+        flex-direction: column;
+    }
+}

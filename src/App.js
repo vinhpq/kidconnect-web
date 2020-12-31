@@ -4,7 +4,8 @@ import { useStateValue } from "./StateProvider";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
 import Login from "./Login";
 import Header from "./Header"
-import Dashboard from './Dashboard';
+import DashboardUser from './DashboardUser';
+import DashboardAdmin from './DashboardAdmin'
 import { auth } from './firebase'
 import { actionTypes } from "./Reducer";
 
@@ -32,27 +33,28 @@ function App() {
 
   return (
     <Router>
-        {!user ? (
-          <Login />
-        ) : (
-          <>
-            <Header />
-            <div className="app__body">
-              <Switch>
-                <Route path="/">
-                  <Dashboard />
-                </Route>
-              </Switch>
+      {!user ? (
+        <Login />
+      ) : (
+        <>
+          <Header />
+          <div className="app__body">
+            <Switch>
+              <Route path="/">
+                { user.email === "demo@nbs.com" ?
+                <DashboardAdmin /> : <DashboardUser /> }
+              </Route>
+            </Switch>
 
-              {/* <Switch>
+            {/* <Switch>
                 <Route path="/login">
                   <Login />
                 </Route>
               </Switch> */}
-            </div>
-          </>
-        )}
-      </Router>
+          </div>
+        </>
+      )}
+    </Router>
   );
 }
 

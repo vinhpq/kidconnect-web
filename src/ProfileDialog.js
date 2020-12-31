@@ -4,11 +4,22 @@ import Dialog from "@material-ui/core/Dialog";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemText from "@material-ui/core/ListItemText";
+import { makeStyles } from '@material-ui/core'
 
-function ProfileDialog(open, ...props) {
+const useStyles = makeStyles({
+  dialog: {
+    position: 'absolute',
+    right: 0,
+    top: 30
+  }
+});
+
+function ProfileDialog({open, ...props}) {
+  const classes = useStyles();
 
     const handleClose = () => {
-
+      console.log('handleClose')
+      props.onClose(-1);
     }
 
     const handleListItemClick = (event, value) => {
@@ -18,21 +29,24 @@ function ProfileDialog(open, ...props) {
     
     return (
       <Dialog
-        // onClose={handleClose}
+        onClose={handleClose}
         open={open}
+        classes={{
+          paper: classes.dialog
+        }}
       >
-        <DialogTitle>Set backup account</DialogTitle>
+        {/* <DialogTitle>Cài đặt</DialogTitle> */}
         <List>
-          <ListItem
-            autoFocus
+          {/* <ListItem
+            // autoFocus
             button
             onClick={(event) => handleListItemClick(event, 0)}
           >
             <ListItemText primary="Thay đổi thông tin" />
-          </ListItem>
+          </ListItem> */}
 
           <ListItem
-            autoFocus
+            // autoFocus
             button
             onClick={(event) => handleListItemClick(event, 1)}
           >

@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
-import "./Dashboard.css";
+import "./DashboardAdmin.css";
 import { MenuItem, Select, Button, CircularProgress } from "@material-ui/core";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
+import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
 import RotateLeftIcon from "@material-ui/icons/RotateLeft";
+import { CSVDownload, CSVLink } from "react-csv";
 import AttendanceCard from "./AttendanceCard";
 import db from "./firebase";
 import { classInfoTest, kidInfoTest } from "./Testdata";
 import AttendanceInfo from "./AttendanceInfo";
 import { useStateValue } from "./StateProvider";
+// import { kidInfo2Csv } from "./util"
 import {
   CLASS_ID_MAX,
   CLASS_ID_ALL,
@@ -39,16 +42,20 @@ function Dashboard() {
   const [classTotal, setClassTotal] = useState(0);
 
   const [{ user }, dispatch] = useStateValue();
-  const [loading, setLoading] = React.useState(false);
-  const [disablePickUp, setDisablePickUp] = useState(false);
-  const [disableLeave, setDisableLeave] = useState(true);
-  const [displayButtonTitle, setDisplayButtonTitle] = useState("Chốt sáng");
-  const timer = React.useRef();
 
-  // const getMapFromArray = data => data.reduce((acc, item) => {
-  //     acc[item.kidId] = {name: item.name, nickname: item.nickname};
-  //     return acc;
-  // }, {})
+  const Status2Text = ["Chưa tới", "Báo nghỉ", "Đã tới", "Đón muộn", "Đã về"];
+
+  const kidInfo2Csv = (_kidInfo) => {
+    return _kidInfo.map((item) => {
+      const csv = {
+        Lớp: classInfo[item.classId]?.name,
+        Tên: item.name,
+        "Trạng thái": Status2Text[item.attendanceStatus],
+      };
+      // console.log(csv)
+      return csv;
+    });
+  };
 
   const getKidInfoByClassId = async (classId, filterOption) => {
     const queryRef =
@@ -65,18 +72,9 @@ function Dashboard() {
             .where("status", "==", KID_STATUS_ACTIVE)
             .where("classId", "==", classId);
 
-    const snapshot =
+    let snapshot =
       filterOption === FILTER_OPTION_ALL
-        ? checkAttendanceType === ATTENDANCE_TYPE_PICKUP
-          ? await queryRef.get()
-          : await queryRef
-              .where("activeStatus", ">=", FILTER_OPTION_ARRIVED)
-              .get()
-        : filterOption === FILTER_OPTION_ARRIVED &&
-          checkAttendanceType === ATTENDANCE_TYPE_PICKUP
-        ? await queryRef
-            .where("activeStatus", ">=", FILTER_OPTION_ARRIVED)
-            .get()
+        ? await queryRef.get()
         : await queryRef.where("activeStatus", "==", filterOption).get();
 
     if (snapshot.empty) {
@@ -101,20 +99,8 @@ function Dashboard() {
   };
 
   useEffect(() => {
-    if (user.email === "demo@nbs.com") {
-      setClassInfo(classInfoTest);
-      setClassId(classInfoTest[0].classId);
-    } else {
-      const _classInfo = classInfoTest.filter(
-        (item) => item.phone1 === user.email || item.phone2 === user.email
-      );
-      if (_classInfo) {
-        setClassInfo(_classInfo);
-        setClassId(_classInfo[0].classId);
-      } else {
-        console.log("No matching classId..");
-      }
-    }
+    setClassInfo(classInfoTest);
+    setClassId(classInfoTest[0].classId);
   }, []);
 
   useEffect(() => {
@@ -133,35 +119,6 @@ function Dashboard() {
                 .collection("Kid")
                 .where("status", "==", 0)
                 .where("classId", "==", classId);
-
-        // await db.collection('School')
-        // .doc('irKMMhRi62L5zljT7qc7')
-        // .collection('Kid')
-        // .where('status', '==', 0)
-        // .where('classId', '==', classId)
-
-        // queryRef.onSnapshot(snapshot => {
-        //     const kidInfoByClass = snapshot.docs.map(doc => ({
-        //         docId: doc.id,
-        //         kidId: doc.data().kidId,
-        //         name: doc.data().name,
-        //         nickname: doc.data().nickName,
-        //         classId: doc.data().classId,
-        //         attendanceStatus: doc.data().activeStatus,
-        //         activeStatus: doc.data().status,
-        //     }));
-
-        //     setKidInfo(kidInfoByClass)
-        //     setClassTotal(kidInfoByClass.length)
-        //     setAttendanceInfo({
-        //         arrivedNum: kidInfoByClass.filter(item => item.attendanceStatus === 1).length,
-        //         notArrivedNum: kidInfoByClass.filter(item => item.attendanceStatus === 0).length,
-        //         absenceNum: kidInfoByClass.filter(item => item.attendanceStatus === 2).length,
-        //         notLeavedNum: kidInfoByClass.filter(item => item.attendanceStatus === 1).length,
-        //         leavedNum: kidInfoByClass.filter(item => item.attendanceStatus === 3).length,
-        //         pickedUpLateNum: kidInfoByClass.filter(item => item.attendanceStatus === 4).length,
-        //     })
-        // })
 
         const snapshot = await queryRef.get();
 
@@ -233,12 +190,12 @@ function Dashboard() {
     setClassId(event.target.value);
   };
 
-  const onCheckAttendanceTypeChange = (event) => {
+const onCheckAttendanceTypeChange = (event) => {
     console.log("onCheckAttendanceTypeChange >>>", event.target.value);
 
     setCheckAttendanceType(event.target.value);
     setCurrentFilterOption(FILTER_OPTION_ALL);
-  };
+};
 
   const setFilterOption = (filterOptionValue) => {
     console.log("setFilterOption  >>>", filterOptionValue);
@@ -251,123 +208,31 @@ function Dashboard() {
     setCurrentFilterOption(filterOptionValue);
   };
 
-  const handleAttendanceStatusChange = (docId, value) => {
-    console.log("handleAttendanceStatusChange >>> ", value);
-
-    db.collection("School")
-      .doc("irKMMhRi62L5zljT7qc7")
-      .collection("Kid")
-      .doc(docId)
-      .update({ activeStatus: value })
-      .then(() => {
-        console.log("Added successfully for classId: ", classId);
-        const snapshot = getKidInfoByClassId(classId, FILTER_OPTION_ALL).then(
-          (kidInfoByClass) => {
-            setKidInfo(
-              currentFilterOption === FILTER_OPTION_ALL
-                ? kidInfoByClass
-                : kidInfoByClass.filter(
-                    (item) => item.attendanceStatus === currentFilterOption
-                  )
-            );
-            setAttendanceInfo({
-              arrivedNum: kidInfoByClass.filter(
-                (item) => item.attendanceStatus === FILTER_OPTION_ARRIVED
-              ).length,
-              notArrivedNum: kidInfoByClass.filter(
-                (item) => item.attendanceStatus === FILTER_OPTION_NOT_ARRIVED
-              ).length,
-              absenceNum: kidInfoByClass.filter(
-                (item) => item.attendanceStatus === FILTER_OPTION_ABSENCE
-              ).length,
-              notLeavedNum: kidInfoByClass.filter(
-                (item) => item.attendanceStatus === FILTER_OPTION_ARRIVED
-              ).length,
-              leavedNum: kidInfoByClass.filter(
-                (item) => item.attendanceStatus === FILTER_OPTION_LEAVED
-              ).length,
-              pickedUpLateNum: kidInfoByClass.filter(
-                (item) => item.attendanceStatus === FILTER_OPTION_PICKUP_LATE
-              ).length,
-            });
-          },
-
-          (error) => console.error(error)
-        );
-      });
-
-    // db.collection('School')
-    //     .doc('irKMMhRi62L5zljT7qc7')
-    //     .collection('KidAttendance')
-    //     .doc(docId)
-    //     .update({
-    //         status: value,
-    //         // timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-    //     })
-  };
+  
   const handleButtonClick = () => {
-    if (!loading) {
-      setLoading(true);
-
-      // Up sync data to firestore
-      timer.current = window.setTimeout(() => {
-        setLoading(false);
-        if (displayButtonTitle === "Chốt sáng") {
-          setDisablePickUp(true);
-          setDisableLeave(false);
-          setDisplayButtonTitle("Chốt chiều");
-        } else if (displayButtonTitle === "Chốt chiều") {
-          setDisablePickUp(true);
-          setDisableLeave(true);
-          setDisplayButtonTitle("Reset");
-        } else if (displayButtonTitle === "Reset") {
-          setDisablePickUp(false);
-          setDisableLeave(true);
-          setDisplayButtonTitle("Chốt sáng");
-        }
-      }, 2000);
-    }
+    
   };
 
-  console.log(
-    "start to render... ",
-    kidInfo,
-  );
+  console.log("start to render... ", kidInfo);
 
   return (
     <div className="dashboard">
       <div className="dashboard__option">
         <div className="dashboard__control">
-          {user.email === "demo@nbs.com" ? (
-            <Select
-              className="dashboard__selectControl"
-              varian="outlined"
-              onChange={onClassChange}
-              value={classId}
-            >
-              {classInfo?.map((item) => (
-                <MenuItem key={item.classId} value={item.classId}>
-                  {item.name}
-                </MenuItem>
-              ))}
-              <MenuItem value={FILTER_OPTION_ALL}>
-                Hiển thị toàn trường
+          <Select
+            className="dashboard__selectControl"
+            varian="outlined"
+            onChange={onClassChange}
+            value={classId}
+          >
+            {classInfo?.map((item) => (
+              <MenuItem key={item.classId} value={item.classId}>
+                {item.name}
               </MenuItem>
-            </Select>
-          ) : (
-            <Select
-              className="dashboard__selectControl"
-              varian="outlined"
-              onChange={onClassChange}
-              value={classId}
-            >
-              {classInfo?.map((item) => (
-                <MenuItem key={item.classId} value={item.classId}>
-                  {item.name}
-                </MenuItem>
-              ))}
-            </Select>
-          )}
+            ))}
+            <MenuItem value={FILTER_OPTION_ALL}>Hiển thị toàn trường</MenuItem>
+          </Select>
+          
           <Select
             className="dashboard__selectControl"
             varian="outlined"
@@ -375,19 +240,31 @@ function Dashboard() {
             value={checkAttendanceType}
           >
             <MenuItem value="1">Điểm danh đón</MenuItem>
-            <MenuItem value="0">Điểm danh về</MenuItem>
+            <MenuItem value="0">Điểm danh về </MenuItem>
           </Select>
+
           <div className="dashboard__action">
             <Button
               size="small"
               variant="contained"
-              startIcon={<CloudUploadIcon />}
+              // startIcon={<CloudUploadIcon />}
               onClick={handleButtonClick}
-              disabled={loading}
             >
-              {displayButtonTitle}
-              {loading && <CircularProgress size={24} />}
+              {"Báo cáo"}
             </Button>
+
+            {/* <CSVLink
+              className="dashboard__action__export"
+              data={kidInfo2Csv(kidInfo)}
+              filename={"my-file.csv"}
+              target="_blank"
+            >
+              <Button size="small" variant="contained" color="secondary" onClick={handleButtonClick}
+              disabled={loading}>
+                {displayButtonTitle}
+                {loading && <CircularProgress size={24} />}
+              </Button>
+            </CSVLink> */}
           </div>
         </div>
 
@@ -407,9 +284,9 @@ function Dashboard() {
             <AttendanceCard
               key={kidId}
               attendanceType={checkAttendanceType}
-              disablePickUp={disablePickUp}
-              disableLeave={disableLeave}
-              onClick={(p, e) => handleAttendanceStatusChange(p, e)}
+              //   finishMorning={finishMorning}
+              //   finishDay={finishDay}
+              //   onClick={(p, e) => handleAttendanceStatusChange(p, e)}
               status={attendanceStatus}
               docId={docId}
               kidName={name}
