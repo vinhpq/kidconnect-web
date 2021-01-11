@@ -1,17 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./DashboardAdmin.css";
 import { MenuItem, Select, Button, CircularProgress } from "@material-ui/core";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
 import RotateLeftIcon from "@material-ui/icons/RotateLeft";
-import { CSVDownload, CSVLink } from "react-csv";
+// import { CSVDownload, CSVLink } from "react-csv";
+import saveCsv from "save-csv";
 import AttendanceCard from "./AttendanceCard";
 import db from "./firebase";
 import { classInfoTest, kidInfoTest } from "./Testdata";
 import AttendanceInfo from "./AttendanceInfo";
 import { useStateValue } from "./StateProvider";
 // import { kidInfo2Csv } from "./util"
-import DatePicker from "./DatePicker"
+import DatePicker from "./DatePicker";
+import DatePickerDialog from "./DatePickerDialog";
+
 import {
   CLASS_ID_MAX,
   CLASS_ID_ALL,
@@ -33,6 +36,7 @@ function Dashboard() {
   const [classInfo, setClassInfo] = useState(null);
   const [classId, setClassId] = useState(CLASS_ID_MAX);
   const [kidInfo, setKidInfo] = useState([]);
+  const [kidInfoStatic, setKidInfoStatic] = useState([]);
   const [checkAttendanceType, setCheckAttendanceType] = useState(
     ATTENDANCE_TYPE_PICKUP
   );
@@ -41,9 +45,8 @@ function Dashboard() {
     FILTER_OPTION_ALL
   );
   const [classTotal, setClassTotal] = useState(0);
-
-  const [{ user }, dispatch] = useStateValue();
-  const [showSearch, setShowSearch] = useState(false);
+  // const [{ user }, dispatch] = useStateValue();
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const Status2Text = ["Chưa tới", "Báo nghỉ", "Đã tới", "Đón muộn", "Đã về"];
 
@@ -101,6 +104,10 @@ function Dashboard() {
   };
 
   useEffect(() => {
+    getKidInfoByClassId(CLASS_ID_ALL, FILTER_OPTION_ALL).then(
+      (_kidInfo) => setKidInfoStatic(_kidInfo),
+      (error) => console.error(error)
+    );
     setClassInfo(classInfoTest);
     setClassId(classInfoTest[0].classId);
   }, []);
@@ -192,12 +199,12 @@ function Dashboard() {
     setClassId(event.target.value);
   };
 
-const onCheckAttendanceTypeChange = (event) => {
+  const onCheckAttendanceTypeChange = (event) => {
     console.log("onCheckAttendanceTypeChange >>>", event.target.value);
 
     setCheckAttendanceType(event.target.value);
     setCurrentFilterOption(FILTER_OPTION_ALL);
-};
+  };
 
   const setFilterOption = (filterOptionValue) => {
     console.log("setFilterOption  >>>", filterOptionValue);
@@ -210,9 +217,50 @@ const onCheckAttendanceTypeChange = (event) => {
     setCurrentFilterOption(filterOptionValue);
   };
 
-  
-  const handleButtonClick = () => {
-    
+  const handleDatePickerClose = async (select, start, end) => {
+    setShowDatePicker(false);
+    console.log(select, start, end);
+    console.log(kidInfoStatic);
+    if (select == 0) {
+      const snapshot =
+        classId === CLASS_ID_ALL
+          ? await db
+              .collection("School")
+              .doc("irKMMhRi62L5zljT7qc7")
+              .collection("KidAttendance")
+              .where("status", "==", KID_STATUS_ACTIVE)
+              .get()
+          : await db
+              .collection("School")
+              .doc("irKMMhRi62L5zljT7qc7")
+              .collection("KidAttendance")
+              .where("status", "==", KID_STATUS_ACTIVE)
+              .where("classId", "==", classId)
+              .get();
+
+      if (snapshot.empty) {
+        console.log("No matching document");
+        return;
+      }
+
+      const kidAttendanceData = [];
+      snapshot.forEach((doc) => {
+        const kid = kidInfoStatic.filter(
+          (item) => item.kidId === doc.data().kidId
+        );
+        // console.log(kid);
+        kidAttendanceData.push({
+          Lớp: classInfo[doc.data().classId].name,
+          Tên: kid[0]?.name,
+          Nickname: kid[0]?.nickname,
+          "Trạng thái": doc.data().status < 2 ? "Nghỉ học" : "Đi học",
+          "Thời gian": doc.data().timestamp,
+        });
+      });
+      // console.log(kidAttendanceData);
+
+      saveCsv(kidAttendanceData, { filename: "rabit.csv" });
+    }
   };
 
   console.log("start to render... ", kidInfo);
@@ -246,28 +294,21 @@ const onCheckAttendanceTypeChange = (event) => {
           </Select>
 
           <div className="dashboard__action">
-            {showSearch && <DatePicker />}
+            {/* {showSearch && <DatePicker />} */}
             <Button
               size="small"
               variant="contained"
               // startIcon={<CloudUploadIcon />}
-              onClick={() => setShowSearch(!showSearch)}
+              // onClick={() => setShowSearch(!showSearch)}
+              onClick={() => setShowDatePicker(true)}
             >
               {"Báo cáo"}
             </Button>
-
-            {/* <CSVLink
-              className="dashboard__action__export"
-              data={kidInfo2Csv(kidInfo)}
-              filename={"my-file.csv"}
-              target="_blank"
-            >
-              <Button size="small" variant="contained" color="secondary" onClick={handleButtonClick}
-              disabled={loading}>
-                {displayButtonTitle}
-                {loading && <CircularProgress size={24} />}
-              </Button>
-            </CSVLink> */}
+            <DatePickerDialog
+              // selectedValue={selectedValue}
+              open={showDatePicker}
+              onClose={(s, start, end) => handleDatePickerClose(s, start, end)}
+            />
           </div>
         </div>
 

@@ -10,7 +10,7 @@ function DatePicker() {
   const [endDate, setEndDate] = useState(new Date());
   const selectionRange = {
     startDate: startDate,
-    endDate: endDate,
+    endDate: null,
     key: "selection",
   };
 
@@ -25,6 +25,8 @@ function DatePicker() {
         ranges={[selectionRange]}
         onChange={handleSelect}
         moveRangeOnFirstSelection={false}
+        direction="horizontal"
+        locale={'vi'}
       />
     </div>
   );

@@ -4,7 +4,7 @@ import { MenuItem, Select, Button, CircularProgress } from "@material-ui/core";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
 import RotateLeftIcon from "@material-ui/icons/RotateLeft";
-import { CSVDownload, CSVLink } from "react-csv";
+// import { CSVDownload, CSVLink } from "react-csv";
 import AttendanceCard from "./AttendanceCard";
 import db from "./firebase";
 import { classInfoTest, kidInfoTest } from "./Testdata";
@@ -47,7 +47,7 @@ function Dashboard() {
   const [displayButtonTitle, setDisplayButtonTitle] = useState("Chốt sáng");
   const timer = React.useRef();
 
-  const Status2Text = ["Chưa tới", "Báo nghỉ", "Đã tới", "Đón muộn", "Đã về"];  
+  const Status2Text = ["Chưa tới", "Báo nghỉ", "Đã tới", "Đón muộn", "Đã về"];
 
   const getKidInfoByClassId = async (classId, filterOption) => {
     const queryRef =
@@ -89,7 +89,7 @@ function Dashboard() {
     } else {
       if (!finishMorning) return;
 
-      console.log('Query kidinfo for leaving...')
+      console.log("Query kidinfo for leaving...");
       snapshot =
         filterOption === FILTER_OPTION_ALL
           ? await queryRef
@@ -243,7 +243,6 @@ function Dashboard() {
 
   // }, []);
 
-
   useEffect(() => {
     if (classId === CLASS_ID_MAX) return;
 
@@ -253,7 +252,7 @@ function Dashboard() {
       },
       (error) => console.error(error)
     );
-  }, checkAttendanceType)
+  }, checkAttendanceType);
 
   const onClassChange = (event) => {
     setClassId(event.target.value);
@@ -355,10 +354,7 @@ function Dashboard() {
     }
   };
 
-  console.log(
-    "start to render... ",
-    kidInfo,
-  );
+  console.log("start to render... ", kidInfo);
 
   return (
     <div className="dashboard">
