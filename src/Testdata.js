@@ -1,5 +1,5 @@
 const classInfoTest = [
-    {classId: 0, name: "Rabbit", total: 14, phone1: '0398900426@nbs.com', phone2: 'rabit@nbs.com'},
+    {classId: 0, name: "Rabbit", total: 14, phone1: '0398900426@nbs.com', phone2: 'rabbit@nbs.com'},
     {classId: 1, name: "Chicken", total: 17, phone1: '0328524938@nbs.com', phone2: 'chicken@nbs.com'},
     {classId: 2, name: "Elephant", total: 25, phone1: '0986228299@nbs.com', phone2: 'elephant@nbs.com'},
     {classId: 3, name: "Zebra", total: 21, phone1: '0981683792@nbs.com', phone2: 'zebra@nbs.com'},

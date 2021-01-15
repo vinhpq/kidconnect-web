@@ -12,7 +12,7 @@ import {
   FILTER_OPTION_PICKUP_LATE,
 } from "./types";
 
-function AttendanceInfo({ total, attendanceType, attendanceInfo, ...props }) {
+function AttendanceInfo({ attendanceType, attendanceInfo, ...props }) {
   const handleClick = (e) => {
     e.preventDefault();
     props.onClick(parseInt(e.currentTarget.id));
@@ -20,117 +20,48 @@ function AttendanceInfo({ total, attendanceType, attendanceInfo, ...props }) {
 
   return (
     <div className="attendanceInfo">
-      {attendanceType == ATTENDANCE_TYPE_PICKUP ? (
-        <>
-          <Button
-            id={FILTER_OPTION_ALL}
-            variant="outlined"
-            onClick={handleClick}
-          >
-            <div className="attendanceInfo__infoText">
-              <span className="attendanceInfo__infoTextLineOne"> Sĩ số </span>
-              <span className="attendanceInfo__infoTextLineTwo"> {total} </span>
-            </div>
-          </Button>
-          <Button
-            id={FILTER_OPTION_NOT_ARRIVED}
-            variant="outlined"
-            color="secondary"
-            onClick={handleClick}
-          >
-            <div className="attendanceInfo__infoText">
-              <span className="attendanceInfo__infoTextLineOne">Chưa tới</span>
-              <span className="attendanceInfo__infoTextLineTwo">
-                {attendanceInfo.notArrivedNum}
-              </span>
-            </div>
-          </Button>
-          <Button
-            id={FILTER_OPTION_ARRIVED}
-            variant="outlined"
-            color="primary"
-            onClick={handleClick}
-          >
-            <div className="attendanceInfo__infoText">
-              <span className="attendanceInfo__infoTextLineOne"> Đã tới </span>
-              <span className="attendanceInfo__infoTextLineTwo">
-                {attendanceInfo.arrivedNum +
-                  attendanceInfo.leavedNum +
-                  attendanceInfo.pickedUpLateNum}
-              </span>
-            </div>
-          </Button>
-          <Button
-            id={FILTER_OPTION_ABSENCE}
-            variant="outlined"
-            onClick={handleClick}
-          >
-            <div className="attendanceInfo__infoText">
-              <span className="attendanceInfo__infoTextLineOne">Báo nghỉ</span>
-              <span className="attendanceInfo__infoTextLineTwo">
-                {attendanceInfo.absenceNum}
-              </span>
-            </div>
-          </Button>
-        </>
-      ) : (
-        <>
-          <Button
-            id={FILTER_OPTION_ALL}
-            variant="outlined"
-            color="secondary"
-            onClick={handleClick}
-          >
-            <div className="attendanceInfo__infoText">
-              <span className="attendanceInfo__infoTextLineOne">Tổng </span>
-              <span className="attendanceInfo__infoTextLineTwo">
-                {" "}
-                {attendanceInfo.arrivedNum +
-                  attendanceInfo.leavedNum +
-                  attendanceInfo.pickedUpLateNum}{" "}
-              </span>
-            </div>
-          </Button>
-          <Button
-            id={FILTER_OPTION_ARRIVED}
-            variant="outlined"
-            color="primary"
-            onClick={handleClick}
-          >
-            <div className="attendanceInfo__infoText">
-              <span className="attendanceInfo__infoTextLineOne"> Chưa về </span>
-              <span className="attendanceInfo__infoTextLineTwo">
-                {attendanceInfo.arrivedNum}
-              </span>
-            </div>
-          </Button>
-          <Button
-            id={FILTER_OPTION_LEAVED}
-            variant="outlined"
-            color="primary"
-            onClick={handleClick}
-          >
-            <div className="attendanceInfo__infoText">
-              <span className="attendanceInfo__infoTextLineOne"> Đã về </span>
-              <span className="attendanceInfo__infoTextLineTwo">
-                {attendanceInfo.leavedNum}
-              </span>
-            </div>
-          </Button>
-          <Button
-            id={FILTER_OPTION_PICKUP_LATE}
-            variant="outlined"
-            onClick={handleClick}
-          >
-            <div className="attendanceInfo__infoText">
-              <span className="attendanceInfo__infoTextLineOne">Đón muộn</span>
-              <span className="attendanceInfo__infoTextLineTwo">
-                {attendanceInfo.pickedUpLateNum}
-              </span>
-            </div>
-          </Button>
-        </>
-      )}
+      <Button
+        id={FILTER_OPTION_ALL}
+        variant="outlined"
+        onClick={handleClick}
+      >
+        <div className="attendanceInfo__infoText">
+          <span className="attendanceInfo__infoTextLineOne"> {attendanceType === ATTENDANCE_TYPE_PICKUP ? "Sĩ số " : "Tổng"}</span>
+          <span className="attendanceInfo__infoTextLineTwo"> {attendanceInfo.total}</span>
+        </div>
+      </Button>
+      <Button
+        id={FILTER_OPTION_NOT_ARRIVED}
+        variant="outlined"
+        color="secondary"
+        onClick={handleClick}
+      >
+        <div className="attendanceInfo__infoText">
+          <span className="attendanceInfo__infoTextLineOne">{attendanceType === ATTENDANCE_TYPE_PICKUP ? "Chưa tới" : "Chưa về"}</span>
+          <span className="attendanceInfo__infoTextLineTwo">{attendanceInfo.info1}</span>
+        </div>
+      </Button>
+      <Button
+        id={FILTER_OPTION_ARRIVED}
+        variant="outlined"
+        color="primary"
+        onClick={handleClick}
+      >
+        <div className="attendanceInfo__infoText">
+          <span className="attendanceInfo__infoTextLineOne"> {attendanceType === ATTENDANCE_TYPE_PICKUP ? "Đã tới" : "Đã về"}</span>
+          <span className="attendanceInfo__infoTextLineTwo">{attendanceInfo.info2}</span>
+        </div>
+      </Button>
+      <Button
+        id={FILTER_OPTION_ABSENCE}
+        variant="outlined"
+        onClick={handleClick}
+      >
+        <div className="attendanceInfo__infoText">
+          <span className="attendanceInfo__infoTextLineOne">{attendanceType === ATTENDANCE_TYPE_PICKUP ? "Báo nghỉ" : "Đón muộn"}</span>
+          <span className="attendanceInfo__infoTextLineTwo">{attendanceInfo.info3}</span>
+        </div>
+      </Button>
     </div>
   );
 }

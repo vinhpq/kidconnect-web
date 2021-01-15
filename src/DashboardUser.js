@@ -21,6 +21,7 @@ import {
   FILTER_OPTION_ABSENCE,
   FILTER_OPTION_PICKUP_LATE,
   FILTER_OPTION_LEAVED,
+  FILTER_OPTION_NOT_LEAVED,
   KID_STATUS_ACTIVE,
   ACTION_PICKUP,
   ACTION_LEAVE,
@@ -31,14 +32,11 @@ function Dashboard() {
   const [classInfo, setClassInfo] = useState(null);
   const [classId, setClassId] = useState(CLASS_ID_MAX);
   const [kidInfo, setKidInfo] = useState([]);
-  const [checkAttendanceType, setCheckAttendanceType] = useState(
-    ATTENDANCE_TYPE_PICKUP
-  );
+  const [kidInfoStatic, setKidInfoStatic] = useState([]);
+  const [checkAttendanceType, setCheckAttendanceType] = useState(ATTENDANCE_TYPE_PICKUP);
   const [attendanceInfo, setAttendanceInfo] = useState([]);
-  const [currentFilterOption, setCurrentFilterOption] = useState(
-    FILTER_OPTION_ALL
-  );
-  const [classTotal, setClassTotal] = useState(0);
+  const [currentFilterOption, setCurrentFilterOption] = useState(FILTER_OPTION_ALL);
+  // const [classTotal, setClassTotal] = useState(0);
 
   const [{ user }, dispatch] = useStateValue();
   const [loading, setLoading] = React.useState(false);
@@ -49,287 +47,201 @@ function Dashboard() {
 
   const Status2Text = ["Chưa tới", "Báo nghỉ", "Đã tới", "Đón muộn", "Đã về"];
 
-  const getKidInfoByClassId = async (classId, filterOption) => {
-    const queryRef =
-      classId === CLASS_ID_ALL
-        ? await db
-            .collection("School")
-            .doc("irKMMhRi62L5zljT7qc7")
-            .collection("Kid")
-            .where("status", "==", KID_STATUS_ACTIVE)
-        : await db
-            .collection("School")
-            .doc("irKMMhRi62L5zljT7qc7")
-            .collection("Kid")
-            .where("status", "==", KID_STATUS_ACTIVE)
-            .where("classId", "==", classId);
-
-    let snapshot = null;
-    if (checkAttendanceType === ATTENDANCE_TYPE_PICKUP) {
-      console.log("Query kidinfo for arriving...");
-
-      if (finishMorning === false) {
-        snapshot =
-          filterOption === FILTER_OPTION_ALL
-            ? await queryRef.get()
-            : await queryRef.where("activeStatus", "==", filterOption).get();
-      } else {
-        if (filterOption === FILTER_OPTION_ALL) {
-          snapshot = await queryRef.get();
-        } else if (filterOption === FILTER_OPTION_ARRIVED) {
-          snapshot = await queryRef
-            .where("activeStatus", ">=", FILTER_OPTION_ARRIVED)
-            .get();
-        } else {
-          snapshot = await queryRef
-            .where("activeStatus", "==", filterOption)
-            .get();
-        }
-      }
-    } else {
-      if (!finishMorning) return;
-
-      console.log("Query kidinfo for leaving...");
-      snapshot =
-        filterOption === FILTER_OPTION_ALL
-          ? await queryRef
-              .where("activeStatus", ">=", FILTER_OPTION_ARRIVED)
-              .get()
-          : await queryRef.where("activeStatus", "==", filterOption).get();
-    }
+  const getKidAttendanceStatus = async (_classId) => {
+    let snapshot = await db
+      .collection("School")
+      .doc("irKMMhRi62L5zljT7qc7")
+      .collection("KidAttendance")
+      .where("classId", "==", _classId)
+      .get();
 
     if (snapshot.empty) {
-      console.log("No matching document");
+      console.log("Class empty...");
       return null;
     }
 
-    const kidInfoByClass = [];
+    let kidAttendanceStatus = [];
     snapshot.forEach((doc) => {
-      kidInfoByClass.push({
-        docId: doc.id,
+      kidAttendanceStatus.push({
         kidId: doc.data().kidId,
-        name: doc.data().name,
-        nickname: doc.data().nickName,
         classId: doc.data().classId,
-        attendanceStatus: doc.data().activeStatus,
-        activeStatus: doc.data().status,
+        status: doc.data().status,
+        timestamp: doc.data().timestamp,
       });
     });
 
-    return kidInfoByClass;
-  };
-
-  useEffect(() => {
-    const _classInfo = classInfoTest.filter(
-      (item) => item.phone1 === user.email || item.phone2 === user.email
-    );
-    if (_classInfo) {
-      setClassInfo(_classInfo);
-      setClassId(_classInfo[0].classId);
-    } else {
-      console.log("No matching classId..");
-    }
-  }, []);
+    return kidAttendanceStatus;
+  }
 
   useEffect(() => {
     async function fetchData() {
-      if (classId != CLASS_ID_MAX) {
-        const queryRef =
-          classId === CLASS_ID_ALL
-            ? await db
-                .collection("School")
-                .doc("irKMMhRi62L5zljT7qc7")
-                .collection("Kid")
-                .where("status", "==", 0)
-            : await db
-                .collection("School")
-                .doc("irKMMhRi62L5zljT7qc7")
-                .collection("Kid")
-                .where("status", "==", 0)
-                .where("classId", "==", classId);
+      console.log('fetchData...')
 
-        // await db.collection('School')
-        // .doc('irKMMhRi62L5zljT7qc7')
-        // .collection('Kid')
-        // .where('status', '==', 0)
-        // .where('classId', '==', classId)
 
-        // queryRef.onSnapshot(snapshot => {
-        //     const kidInfoByClass = snapshot.docs.map(doc => ({
-        //         docId: doc.id,
-        //         kidId: doc.data().kidId,
-        //         name: doc.data().name,
-        //         nickname: doc.data().nickName,
-        //         classId: doc.data().classId,
-        //         attendanceStatus: doc.data().activeStatus,
-        //         activeStatus: doc.data().status,
-        //     }));
+      // Loading Class from Firestore...
+      let snapshot = await db.collection("School")
+        .doc("irKMMhRi62L5zljT7qc7")
+        .collection("Class")
+        .get()
 
-        //     setKidInfo(kidInfoByClass)
-        //     setClassTotal(kidInfoByClass.length)
-        //     setAttendanceInfo({
-        //         arrivedNum: kidInfoByClass.filter(item => item.attendanceStatus === 1).length,
-        //         notArrivedNum: kidInfoByClass.filter(item => item.attendanceStatus === 0).length,
-        //         absenceNum: kidInfoByClass.filter(item => item.attendanceStatus === 2).length,
-        //         notLeavedNum: kidInfoByClass.filter(item => item.attendanceStatus === 1).length,
-        //         leavedNum: kidInfoByClass.filter(item => item.attendanceStatus === 3).length,
-        //         pickedUpLateNum: kidInfoByClass.filter(item => item.attendanceStatus === 4).length,
-        //     })
-        // })
-
-        const snapshot = await queryRef.get();
-
-        if (snapshot.empty) {
-          console.log("No matching document");
-          return null;
-        }
-
-        const kidInfoByClass = [];
-        snapshot.forEach((doc) => {
-          kidInfoByClass.push({
-            docId: doc.id,
-            kidId: doc.data().kidId,
-            name: doc.data().name,
-            nickname: doc.data().nickName,
-            classId: doc.data().classId,
-            attendanceStatus: doc.data().activeStatus,
-            activeStatus: doc.data().status,
-          });
-        });
-
-        setKidInfo(kidInfoByClass);
-        setClassTotal(kidInfoByClass.length);
-        setAttendanceInfo({
-          arrivedNum: kidInfoByClass.filter(
-            (item) => item.attendanceStatus === FILTER_OPTION_ARRIVED
-          ).length,
-          notArrivedNum: kidInfoByClass.filter(
-            (item) => item.attendanceStatus === FILTER_OPTION_NOT_ARRIVED
-          ).length,
-          absenceNum: kidInfoByClass.filter(
-            (item) => item.attendanceStatus === FILTER_OPTION_ABSENCE
-          ).length,
-          notLeavedNum: kidInfoByClass.filter(
-            (item) => item.attendanceStatus === FILTER_OPTION_ARRIVED
-          ).length,
-          leavedNum: kidInfoByClass.filter(
-            (item) => item.attendanceStatus === FILTER_OPTION_LEAVED
-          ).length,
-          pickedUpLateNum: kidInfoByClass.filter(
-            (item) => item.attendanceStatus === FILTER_OPTION_PICKUP_LATE
-          ).length,
-        });
+      if (snapshot.empty) {
+        console.log("No matching document");
+        return null;
       }
+
+      let pos = user.email.indexOf('@')
+      if (pos < 0) {
+        console.log('Not a valid user email...');
+        return null;
+      }
+
+      let _classId = -1;
+      let _classInfo = null;
+      snapshot.forEach((doc) => {
+        if (doc.data().name.toLowerCase() === user.email.slice(0, pos).toLowerCase()) {
+          _classInfo = doc.data()
+          _classId = doc.data().classId;
+        }
+      })
+
+      if (_classId === -1) {
+        console.log('No matching classId...')
+        return null;
+      }
+      setClassInfo(_classInfo);
+      setClassId(_classId);
+
+      // Loading Kid from Firestore...
+      snapshot = await db
+        .collection("School")
+        .doc("irKMMhRi62L5zljT7qc7")
+        .collection("Kid")
+        .where("status", "==", 0)
+        .where("classId", "==", _classId)
+        .get();
+
+      if (snapshot.empty) {
+        console.log("Class empty...");
+        return null;
+      }
+
+      let kidInfoByClass = [];
+      snapshot.forEach((doc) => {
+        kidInfoByClass.push({
+          docId: doc.id,
+          kidId: doc.data().kidId,
+          name: doc.data().name,
+          nickname: doc.data().nickName,
+          classId: doc.data().classId,
+          // attendanceStatus: doc.data().activeStatus,
+          // activeStatus: doc.data().status,
+        });
+      });
+
+      setKidInfo(kidInfoByClass);
+      setKidInfoStatic(kidInfoByClass);
+      // setClassTotal(kidInfoByClass.length);
+
+      console.log('KidInfo: ', kidInfoByClass)
+
+      // Loading KidAttendance from Firestore...
+      getKidAttendanceStatus(_classId).then(
+        (kidAttendanceStatus) => { 
+          if (null == kidAttendanceStatus) {
+            console.log("No attendance record for today...");
+
+            // Refresh attendance status for today, ONLY ONCE...
+          } else {
+            setAttendanceInfo({
+              total: _classInfo.count,
+              info1: kidAttendanceStatus.filter((item) => item.status === FILTER_OPTION_NOT_ARRIVED).length,
+              info2: kidAttendanceStatus.filter((item) => item.status === FILTER_OPTION_ABSENCE).length,
+              info3: kidAttendanceStatus.filter((item) => item.status === FILTER_OPTION_ARRIVED).length,
+            });
+            console.log("AttendanceInfo: ", kidAttendanceStatus);
+          }
+        },
+        (error) => console.error(error)
+      );     
     }
 
-    console.log("inside useEffect() classId: ", classId);
-
     fetchData();
-  }, [classId]);
-
-  // useEffect(() => {
-  //     db
-  //         .collection('School')
-  //         .doc('irKMMhRi62L5zljT7qc7')
-  //         .collection('Class')
-  //         .onSnapshot(snapshot => {
-  //             console.log('Class >>>', snapshot.docs.map(doc => doc.data()));
-  //             setClasses(snapshot.docs.map(doc => ({
-  //                 classId: doc.data().classId,
-  //                 name: doc.data().name,
-  //                 total: doc.data().count
-  //             })));
-  //     })
-
-  // }, []);
+  }, []);
 
   useEffect(() => {
-    if (classId === CLASS_ID_MAX) return;
+    if (classId === CLASS_ID_MAX)
+      return;
 
-    getKidInfoByClassId(classId, currentFilterOption).then(
-      (kidInfoByClass) => {
-        setKidInfo(kidInfoByClass);
+    getKidAttendanceStatus(classId).then(
+      (kidAttendanceStatus) => {
+        let filteredKidStatus = null;
+
+        if (null == kidAttendanceStatus) {
+          console.log("No kid found...");
+          return;
+        }
+
+        if (!finishMorning) {
+          if (currentFilterOption === FILTER_OPTION_ALL) {
+            filteredKidStatus = kidAttendanceStatus;
+          } else {
+            filteredKidStatus = kidAttendanceStatus.filter((item) => item.status === currentFilterOption)
+          }
+        } else {
+          if ( (checkAttendanceType === ATTENDANCE_TYPE_PICKUP && currentFilterOption === FILTER_OPTION_ARRIVED) || 
+          (checkAttendanceType === ATTENDANCE_TYPE_LEAVE && currentFilterOption === FILTER_OPTION_ALL)) {
+            filteredKidStatus = kidAttendanceStatus.filter((item) => item.status >= FILTER_OPTION_ARRIVED)
+          } else if (checkAttendanceType === ATTENDANCE_TYPE_PICKUP && currentFilterOption === FILTER_OPTION_ALL) {
+            filteredKidStatus = kidAttendanceStatus;
+          } else {
+            filteredKidStatus = kidAttendanceStatus.filter((item) => item.status === currentFilterOption)
+          }
+        }
+
+        let kidIdList = filteredKidStatus.map((item) => { return item.kidId; })
+        let filteredKidInfo = kidInfoStatic.filter((item) => kidIdList.includes(item.kidId));
+
+        console.log(filteredKidInfo);
+        setKidInfo(filteredKidInfo);
+
+        if (checkAttendanceType === ATTENDANCE_TYPE_PICKUP) {
+          setAttendanceInfo({
+              total: classInfo.count,
+              info1: kidAttendanceStatus.filter((item) => item.status === FILTER_OPTION_NOT_ARRIVED).length,
+              info2: kidAttendanceStatus.filter((item) => item.status === FILTER_OPTION_ARRIVED).length,
+              info3: kidAttendanceStatus.filter((item) => item.status === FILTER_OPTION_ABSENCE).length,
+            });
+        } else {
+          setAttendanceInfo({
+              total: kidAttendanceStatus.filter((item) => item.status >= FILTER_OPTION_ARRIVED).length,
+              info1: kidAttendanceStatus.filter((item) => item.status === FILTER_OPTION_NOT_LEAVED).length,
+              info2: kidAttendanceStatus.filter((item) => item.status === FILTER_OPTION_LEAVED).length,
+              info3: kidAttendanceStatus.filter((item) => item.status === FILTER_OPTION_PICKUP_LATE).length,
+            });
+        }
+        
       },
       (error) => console.error(error)
     );
-  }, checkAttendanceType);
-
-  const onClassChange = (event) => {
-    setClassId(event.target.value);
-  };
+  }, [checkAttendanceType, currentFilterOption]);
 
   const onCheckAttendanceTypeChange = (event) => {
-    console.log("onCheckAttendanceTypeChange >>>", event.target.value);
-
     setCheckAttendanceType(event.target.value);
-    setCurrentFilterOption(FILTER_OPTION_ALL);
   };
 
   const setFilterOption = (filterOptionValue) => {
-    console.log("setFilterOption  >>>", filterOptionValue);
-    getKidInfoByClassId(classId, filterOptionValue).then(
-      (kidInfoByClass) => {
-        setKidInfo(kidInfoByClass);
-      },
-      (error) => console.error(error)
-    );
     setCurrentFilterOption(filterOptionValue);
   };
 
   const handleAttendanceStatusChange = (docId, value) => {
-    console.log("handleAttendanceStatusChange >>> ", value);
-
     db.collection("School")
       .doc("irKMMhRi62L5zljT7qc7")
-      .collection("Kid")
+      .collection("KidAttendance")
       .doc(docId)
-      .update({ activeStatus: value })
-      .then(() => {
-        console.log("Added successfully for classId: ", classId);
-        const snapshot = getKidInfoByClassId(classId, FILTER_OPTION_ALL).then(
-          (kidInfoByClass) => {
-            setKidInfo(
-              currentFilterOption === FILTER_OPTION_ALL
-                ? kidInfoByClass
-                : kidInfoByClass.filter(
-                    (item) => item.attendanceStatus === currentFilterOption
-                  )
-            );
-            setAttendanceInfo({
-              arrivedNum: kidInfoByClass.filter(
-                (item) => item.attendanceStatus === FILTER_OPTION_ARRIVED
-              ).length,
-              notArrivedNum: kidInfoByClass.filter(
-                (item) => item.attendanceStatus === FILTER_OPTION_NOT_ARRIVED
-              ).length,
-              absenceNum: kidInfoByClass.filter(
-                (item) => item.attendanceStatus === FILTER_OPTION_ABSENCE
-              ).length,
-              notLeavedNum: kidInfoByClass.filter(
-                (item) => item.attendanceStatus === FILTER_OPTION_ARRIVED
-              ).length,
-              leavedNum: kidInfoByClass.filter(
-                (item) => item.attendanceStatus === FILTER_OPTION_LEAVED
-              ).length,
-              pickedUpLateNum: kidInfoByClass.filter(
-                (item) => item.attendanceStatus === FILTER_OPTION_PICKUP_LATE
-              ).length,
-            });
-          },
-
-          (error) => console.error(error)
-        );
-      });
-
-    // db.collection('School')
-    //     .doc('irKMMhRi62L5zljT7qc7')
-    //     .collection('KidAttendance')
-    //     .doc(docId)
-    //     .update({
-    //         status: value,
-    //         // timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-    //     })
+      .update({ status: value })
+      .then(console.log('TODO................'));
   };
+
   const handleButtonClick = () => {
     if (!loading) {
       setLoading(true);
@@ -354,7 +266,7 @@ function Dashboard() {
     }
   };
 
-  console.log("start to render... ", kidInfo);
+  // console.log("start to render... ", kidInfo);
 
   return (
     <div className="dashboard">
@@ -363,14 +275,11 @@ function Dashboard() {
           <Select
             className="dashboard__selectControl"
             varian="outlined"
-            onChange={onClassChange}
             value={classId}
           >
-            {classInfo?.map((item) => (
-              <MenuItem key={item.classId} value={item.classId}>
-                {item.name}
-              </MenuItem>
-            ))}
+            <MenuItem key={classId} value={classId}>
+              {classInfo?.name}
+            </MenuItem>
           </Select>
           <Select
             className="dashboard__selectControl"
@@ -394,19 +303,6 @@ function Dashboard() {
               {displayButtonTitle}
               {loading && <CircularProgress size={24} />}
             </Button>
-
-            {/* <CSVLink
-              className="dashboard__action__export"
-              data={kidInfo2Csv(kidInfo)}
-              filename={"my-file.csv"}
-              target="_blank"
-            >
-              <Button size="small" variant="contained" color="secondary" onClick={handleButtonClick}
-              disabled={loading}>
-                {displayButtonTitle}
-                {loading && <CircularProgress size={24} />}
-              </Button>
-            </CSVLink> */}
           </div>
         </div>
 
@@ -415,7 +311,7 @@ function Dashboard() {
             attendanceType={checkAttendanceType}
             onClick={(e) => setFilterOption(e)}
             attendanceInfo={attendanceInfo}
-            total={classTotal}
+            // total={classTotal}
           />
         </div>
       </div>
@@ -433,7 +329,7 @@ function Dashboard() {
               docId={docId}
               kidName={name}
               kidNickname={nickname}
-              className={classInfo[classId]?.name}
+              className={classInfo?.name}
               kidImage="./null.jpg"
             />
           )
