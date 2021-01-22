@@ -71,7 +71,7 @@ function AttendanceCard({
                   disabled={
                     user.email === "demo@nbs.com"
                       ? true
-                      : finishMorning && status === FILTER_OPTION_ARRIVED
+                      : finishMorning && status >= FILTER_OPTION_ARRIVED
                   }
                 />
                 <FormControlLabel
