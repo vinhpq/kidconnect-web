@@ -68,31 +68,19 @@ function AttendanceCard({
                   value={FILTER_OPTION_ARRIVED}
                   control={<Radio />}
                   label="Đã tới"
-                  disabled={
-                    user.email === "demo@nbs.com"
-                      ? true
-                      : finishMorning && status >= FILTER_OPTION_ARRIVED
-                  }
+                  disabled={ finishMorning && status >= FILTER_OPTION_ARRIVED }
                 />
                 <FormControlLabel
                   value={FILTER_OPTION_NOT_ARRIVED}
                   control={<Radio />}
                   label="Chưa tới"
-                  disabled={
-                    user.email === "demo@nbs.com"
-                      ? true
-                      : finishMorning && status === FILTER_OPTION_ARRIVED
-                  }
+                  disabled={ finishMorning && status === FILTER_OPTION_ARRIVED }
                 />
                 <FormControlLabel
                   value={FILTER_OPTION_ABSENCE}
                   control={<Radio />}
                   label="Báo nghỉ"
-                  disabled={
-                    user.email === "demo@nbs.com"
-                      ? true
-                      : finishMorning && status === FILTER_OPTION_ARRIVED
-                  }
+                  disabled={finishMorning && status === FILTER_OPTION_ARRIVED }
                 />
               </RadioGroup>
             </FormControl>
@@ -105,31 +93,19 @@ function AttendanceCard({
                   value={FILTER_OPTION_ARRIVED}
                   control={<Radio />}
                   label="Chưa về"
-                  disabled={
-                    user.email === "demo@nbs.com"
-                      ? true
-                      : finishDay && status === FILTER_OPTION_LEAVED
-                  }
+                  disabled={ finishDay && status === FILTER_OPTION_LEAVED }
                 />
                 <FormControlLabel
                   value={FILTER_OPTION_LEAVED}
                   control={<Radio />}
                   label="Đã về"
-                  disabled={
-                    user.email === "demo@nbs.com"
-                      ? true
-                      : finishDay && status === FILTER_OPTION_LEAVED
-                  }
+                  disabled={ finishDay && status === FILTER_OPTION_LEAVED }
                 />
                 <FormControlLabel
                   value={FILTER_OPTION_PICKUP_LATE}
                   control={<Radio />}
                   label="Đón muộn"
-                  disabled={
-                    user.email === "demo@nbs.com"
-                      ? true
-                      : finishDay && status === FILTER_OPTION_LEAVED
-                  }
+                  disabled={ finishDay && status === FILTER_OPTION_LEAVED }
                 />
               </RadioGroup>
             </FormControl>

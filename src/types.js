@@ -1,4 +1,4 @@
-export const CLASS_ID_MAX = 9999;
+export const CLASS_ID_MAX = 1000;
 export const CLASS_ID_ALL = 1000;
 export const ATTENDANCE_TYPE_PICKUP = '1';
 export const ATTENDANCE_TYPE_LEAVE = '0';

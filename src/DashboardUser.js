@@ -1,19 +1,13 @@
 import React, { useState, useEffect } from "react";
 import "./DashboardUser.css";
-import { MenuItem, Select, Button, Checkbox } from "@material-ui/core";
-import CloudUploadIcon from "@material-ui/icons/CloudUpload";
-import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
-import RotateLeftIcon from "@material-ui/icons/RotateLeft";
-// import { CSVDownload, CSVLink } from "react-csv";
+import { MenuItem, Select, Checkbox } from "@material-ui/core";
 import AttendanceCard from "./AttendanceCard";
 import db from "./firebase";
 import firebase from "firebase";
-import { classInfoTest, kidInfoTest } from "./Testdata";
 import AttendanceInfo from "./AttendanceInfo";
 import { useStateValue } from "./StateProvider";
 import {
   CLASS_ID_MAX,
-  CLASS_ID_ALL,
   ATTENDANCE_TYPE_PICKUP,
   ATTENDANCE_TYPE_LEAVE,
   FILTER_OPTION_ALL,
@@ -24,9 +18,6 @@ import {
   FILTER_OPTION_LEAVED,
   FILTER_OPTION_NOT_LEAVED,
   KID_STATUS_ACTIVE,
-  ACTION_PICKUP,
-  ACTION_LEAVE,
-  ACTION_RESET,
 } from "./types";
 
 function Dashboard() {
@@ -37,17 +28,13 @@ function Dashboard() {
   const [checkAttendanceType, setCheckAttendanceType] = useState(ATTENDANCE_TYPE_PICKUP);
   const [attendanceInfo, setAttendanceInfo] = useState([]);
   const [currentFilterOption, setCurrentFilterOption] = useState(FILTER_OPTION_ALL);
-  // const [classTotal, setClassTotal] = useState(0);
 
   const [{ user }, dispatch] = useStateValue();
-  const [loading, setLoading] = React.useState(false);
   const [finishMorning, setFinishMorning] = useState(false);
   const [finishDay, setFinishDay] = useState(false);
   const timer = React.useRef();
   const today = new Date().setHours(0, 0, 0, 0);
   const beginOfDay = new Date(today);
-
-  const Status2Text = ["Chưa tới", "Báo nghỉ", "Đã tới", "Đón muộn", "Đã về"];
 
   const getKidAttendanceStatus = async (_classId) => {
     // console.log(beginOfDay)
@@ -66,7 +53,7 @@ function Dashboard() {
 
     let kidAttendanceStatus = [];
     snapshot.forEach((doc) => {
-      // console.log(doc.data().timestamp.toDate());
+      console.log(doc.data().timestamp.toDate());
       kidAttendanceStatus.push({
         docId: doc.id,
         kidId: doc.data().kidId,
@@ -204,8 +191,7 @@ function Dashboard() {
         .collection("School")
         .doc("irKMMhRi62L5zljT7qc7")
         .collection("Kid")
-        .where("status", "==", 0)
-        .where("classId", "==", _classId)
+        .where("status", "==", KID_STATUS_ACTIVE)
         .get();
 
       if (snapshot.empty) {
